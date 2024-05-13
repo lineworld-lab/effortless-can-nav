@@ -1,0 +1,9 @@
+*.html linguist-vendored
+*.css linguist-vendored
+*.c linguist-vendored=false
+*.h linguist-vendored=false
+*.cc linguist-vendored=false
+*.hpp linguist-vendored=false
+*.sh linguist-vendored=false
+*.py linguist-vendored
+*.js linguist-vendored

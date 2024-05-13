@@ -1,0 +1,13 @@
+[Unit]
+Description=agvros v1 ethercat master runner service
+After=network.target
+Wants=ecat-master.v1.target
+StartLimitIntervalSec=0
+[Service]
+Type=simple
+Restart=always
+RestartSec=5
+User=root
+ExecStart=/home/cnc/box/ethercat-master/sys.d/ecat-master.v1.runner
+[Install]
+WantedBy=default.target

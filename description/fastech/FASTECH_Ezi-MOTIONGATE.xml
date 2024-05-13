@@ -1,0 +1,507 @@
+<?xml version="1.0"?>
+<EtherCATInfo Version="1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="EtherCATInfo.xsd">
+	<Vendor>
+		<Id>#x0FA00000</Id>
+		<Name>Fastech Co.,Ltd.</Name>
+		<ImageData16x14>424DD6020000000000003600000028000000100000000E0000000100180000000000A00200000000000000000000000000000000000000FFFF00FFFF00000000FFFF00FFFF00000000000000FFFF00FFFF00000000000000FFFF00000000FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00000000FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00000000000000FFFF00000000FFFF00FFFF00FFFF00000000000000000000FFFF00FFFF00FFFF00000000FFFF00FFFF00000000FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00000000FFFF00FFFF00000000000000000000FFFF00000000000000FFFF00FFFF00000000000000FFFF00000000FFFF00000000FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00000000000000000000000000000000000000000000000000000000000000000000000000000000000000FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00000000000000000000000000FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00FFFF00FFFF00000000FFFF00FFFF00000000000000000000FFFF00000000000000000000000000000000FFFF00000000000000000000000000FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00FFFF00FFFF00000000FFFF00000000FFFF00FFFF00FFFF00FFFF00FFFF00000000000000000000FFFF00FFFF00000000000000000000FFFF00FFFF00000000000000000000000000FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF</ImageData16x14>
+	</Vendor>
+	<Descriptions>
+		<Groups>
+			<Group>
+				<Type>Gateway</Type>
+				<Name LcId="1033">FASTECH Motion Gateways</Name>
+				<ImageData16x14>424DD6020000000000003600000028000000100000000E0000000100180000000000A0020000232E0000232E0000000000000000000000FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF09EDED6941426B3F402BB1B16843445E5555477F7F4D74745A5D5D14D9D96745460AEBEC487C7D70363741898A00FDFD00FEFE33A2A2644C4C5B5B5B6B3F405860613F8D8D742F30585F6030A8A87035364385867035361BCDCD6D3B3C15D8D800FEFE5E5556634D4E29B4B55C595A5D58583A9595694142742D2E516D6E3F8C8D6A4041536A6A684445752D2E0FE1E100FFFF22C1C168444555656614D9DA1DCACA0FE2E21DCACA12DEDE15D8D80AEBEB16D6D70BEBEB1CCCCC11DEDF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF09ECEC4E72734E72734A797A2CAEAE4E72734E727328B5B54C767603F8F800FFFF00FFFF00FFFF00FFFF00FFFF00FFFF04F6F6732F3071353654686812DCDD6548495B5A5B25BBBB79252622C0C05B5B5C369E9E00FFFF00FFFF00FFFF00FFFF00FDFD65494A752D2D634C4D22C1C16E3A3A772A2B20C4C478262728B6B7379C9C23BFC000FFFF00FFFF00FFFF00FFFF00FEFE53686977292A43858513DADA1DC9C91EC8C913DBDB289CC710D2E800FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF4288887B24257B2425408B8C00FFFF00FFFF00FFFF16A6F70EC4FA00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF0DE6E71EC9C91EC9C912DDDD00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF</ImageData16x14>
+			</Group>
+		</Groups>
+		<Devices>
+			<Device Physics="YY">
+				<Type ProductCode="#x00000010" RevisionNo="#x00010000">Ezi-MOTIONGATE</Type>
+				<Name LcId="1033"><![CDATA[Ezi-MOTIONGATE]]></Name>
+				<Info>
+					<Mailbox>
+						<Timeout>
+							<RequestTimeout>100</RequestTimeout>
+							<ResponseTimeout>6000</ResponseTimeout>
+						</Timeout>
+					</Mailbox>
+				</Info>
+				<GroupType>Gateway</GroupType>
+				<Fmmu>Outputs</Fmmu>
+				<Fmmu>Inputs</Fmmu>
+				<Sm MinSize="276" MaxSize="276" DefaultSize="276" StartAddress="#x1C00" ControlByte="#x26" Enable="1">MBoxOut</Sm>
+				<Sm MinSize="276" MaxSize="276" DefaultSize="276" StartAddress="#x1E00" ControlByte="#x22" Enable="1">MBoxIn</Sm>
+				<Sm StartAddress="#x1000" ControlByte="#x64" Enable="1">Outputs</Sm>
+				<Sm StartAddress="#x1600" ControlByte="#x20" Enable="1">Inputs</Sm>
+				<RxPdo Fixed="1" Mandatory="1" Sm="2">
+					<Index>#x1600</Index>
+					<Name>DO RxPDO-Map</Name>
+					<Entry>
+						<Index>#x2001</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis0 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2002</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis0 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2003</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis1 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2004</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis1 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2005</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis2 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2006</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis2 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2007</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis3 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2008</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis3 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2009</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis4 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200a</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis4 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200b</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis5 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200c</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis5 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200d</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis6 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200e</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis6 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x200f</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis7 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2010</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis7 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2011</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis8 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2012</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis8 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2013</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis9 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2014</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis9 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2015</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis10 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2016</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis10 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2017</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis11 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2018</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis11 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2019</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis12 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201a</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis12 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201b</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis13 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201c</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis13 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201d</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis14 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201e</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis14 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x201f</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis15 Input Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2020</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis15 Input Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+				</RxPdo>
+				<TxPdo Fixed="1" Mandatory="1" Sm="3">
+					<Index>#x1a00</Index>
+					<Name>DI TxPDO-Map</Name>
+					<Entry>
+						<Index>#x2021</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis0 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2022</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis0 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2023</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis1 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2024</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis1 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2025</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis2 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2026</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis2 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2027</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis3 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2028</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis3 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2029</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis4 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202a</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis4 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202b</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis5 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202c</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis5 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202d</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis6 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202e</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis6 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x202f</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis7 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2030</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis7 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2031</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis8 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2032</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis8 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2033</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis9 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2034</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis9 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2035</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis10 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2036</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis10 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2037</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis11 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2038</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis11 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2039</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis12 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203a</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis12 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203b</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis13 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203c</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis13 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203d</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis14 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203e</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis14 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x203f</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis15 Output Bit-Map</Name>
+						<DataType>DWORD</DataType>
+					</Entry>
+					<Entry>
+						<Index>#x2040</Index>
+						<SubIndex>0</SubIndex>
+						<BitLen>32</BitLen>
+						<Name>Axis15 Output Data</Name>
+						<DataType>DINT</DataType>
+					</Entry>
+				</TxPdo>
+				<Mailbox DataLinkLayer="1">
+					<CoE SdoInfo="1" CompleteAccess="1" PdoAssign="0" PdoConfig="0" PdoUpload="0"/>
+				</Mailbox>
+				<ESC>
+					<Reg0400>25000</Reg0400>
+					<Reg0420>0</Reg0420>
+				</ESC>
+				<Eeprom>
+					<ByteSize>2048</ByteSize>
+					<ConfigData>0802000000000000000000000000</ConfigData>
+				</Eeprom>
+				<ImageData16x14>424DD6020000000000003600000028000000100000000E0000000100180000000000A0020000232E0000232E0000000000000000000000FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF01FEFE6465666C454635BDBD7C343523CACB713A3B792E2F00FDFD30AAAB6450515F5A5B704545557C7D0CEEEE00FFFF00FFFF2FB9B9792E2F7A3031792E2F6D5A5A763636792E2F03F8F8792E2F792E2F33A6A6685152792E2F49818200FFFF00FFFF06F7F7783E3F792E2F6F3D3E6C4546792E2F792E2F01FBFB626666792E2F24BFBF22C2C358676746999A00FFFF00FFFF00FFFF5C6363792E2F49808033A7A7792E2F792E2F00FFFF17E8E84786877A4142792E2F69585934C7C800FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF09ECEC4E72734E72734A797A2CAEAE4E72734E727328B5B54C767603F8F800FFFF00FFFF00FFFF00FFFF00FFFF00FFFF04F6F6732F3071353654686812DCDD6548495B5A5B25BBBB79252622C0C05B5B5C369E9E00FFFF00FFFF00FFFF00FFFF00FDFD65494A752D2D634C4D22C1C16E3A3A772A2B20C4C478262728B6B7379C9C23BFC000FFFF00FFFF00FFFF00FFFF00FEFE53686977292A43858513DADA1DC9C91EC8C913DBDB289CC710D2E800FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF4288887B24257B2425408B8C00FFFF00FFFF00FFFF16A6F70EC4FA00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF0DE6E71EC9C91EC9C912DDDD00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF00FFFF</ImageData16x14>
+			</Device>
+		</Devices>
+	</Descriptions>
+</EtherCATInfo>
+

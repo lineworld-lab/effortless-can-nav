@@ -1,0 +1,15 @@
+#!/bin/bash
+
+
+sudo /bin/cp -rf ecat-master.v1.service /etc/systemd/system/
+
+sudo /bin/cp -rf ecat-master.v1.runner.service /etc/systemd/system/
+ 
+sudo systemctl enable ecat-master.v1
+
+sudo systemctl enable ecat-master.v1.runner
+
+sudo systemctl start ecat-master.v1
+
+sudo systemctl start ecat-master.v1.runner
+

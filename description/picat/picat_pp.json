@@ -1,0 +1,192 @@
+{
+  "ProjectInfo": [
+    {
+      "PrjDir": "/home/ubuntu/ethercat-motctrl",
+      "Name": "picat",
+      "Realtime": "preempt-rt",
+      "Language": "c"
+    },
+    {
+      "MasterIndex": 0,
+      "SlaveNum": 4,
+      "DomainNum": 1
+    },
+    {
+      "DC": false,
+      "DCRefClock": 0,
+      "UseMasterTime": false
+    }
+  ],
+  "SlaveInfo": [
+    {
+      "Family": 0,
+      "alias": 0,
+      "pos": 0,
+      "copies": 1,
+      "vid": "0x0FA00000",
+      "proCode": "0x01002",
+      "name": "Ezi-SERVO2 EtherCAT"
+    },
+    {
+      "Family": 0,
+      "alias": 0,
+      "pos": 1,
+      "copies": 1,
+      "vid": "0x0FA00000",
+      "proCode": "0x01002",
+      "name": "Ezi-SERVO2 EtherCAT"
+    },
+    {
+      "Family": 0,
+      "alias": 0,
+      "pos": 2,
+      "copies": 1,
+      "vid": "0x0FA00000",
+      "proCode": "0x01002",
+      "name": "Ezi-SERVO2 EtherCAT"
+    },
+    {
+      "Family": 0,
+      "alias": 0,
+      "pos": 3,
+      "copies": 1,
+      "vid": "0x0FA00000",
+      "proCode": "0x01002",
+      "name": "Ezi-SERVO2 EtherCAT"
+    }
+  ],
+  "PDOMap": [
+    {
+      "Family": 0,
+      "Profile": 402,
+      "RxPDO": [
+        {
+          "index": "0x1601",
+          "name": "PP Outputs",
+          "sm": -1,
+          "entries": [
+            {
+              "index": "0x6040",
+              "subIndex": "0",
+              "dType": "UINT",
+              "name": "Control Word",
+              "bitLength": 16,
+              "tableData": {
+                "id": 0
+              }
+            },
+            {
+              "index": "0x607A",
+              "subIndex": "0",
+              "dType": "DINT",
+              "name": "Target Position",
+              "bitLength": 32,
+              "tableData": {
+                "id": 1
+              }
+            },
+            {
+              "index": "0x6081",
+              "subIndex": "0",
+              "dType": "UDINT",
+              "name": "Profile Velocity",
+              "bitLength": 32,
+              "tableData": {
+                "id": 2
+              }
+            },
+            {
+              "index": "0x60FE",
+              "subIndex": "1",
+              "dType": "UDINT",
+              "name": "Physical outputs",
+              "bitLength": 32,
+              "tableData": {
+                "id": 3
+              }
+            },
+            {
+              "index": "0x6060",
+              "subIndex": "0",
+              "dType": "SINT",
+              "name": "Modes of Operation",
+              "bitLength": 8,
+              "tableData": {
+                "id": 4
+              }
+            }
+          ]
+        }
+      ],
+      "TxPDO": [
+        {
+          "index": "0x1A01",
+          "name": "PP Inputs",
+          "sm": -1,
+          "entries": [
+            {
+              "index": "0x6041",
+              "subIndex": "0",
+              "dType": "UINT",
+              "name": "Status Word",
+              "bitLength": 16,
+              "tableData": {
+                "id": 0
+              }
+            },
+            {
+              "index": "0x6064",
+              "subIndex": "0",
+              "dType": "DINT",
+              "name": "Position Actual Value",
+              "bitLength": 32,
+              "tableData": {
+                "id": 1
+              }
+            },
+            {
+              "index": "0x606C",
+              "subIndex": "0",
+              "dType": "DINT",
+              "name": "Velocity Actual Value",
+              "bitLength": 32,
+              "tableData": {
+                "id": 2
+              }
+            },
+            {
+              "index": "0x60FD",
+              "subIndex": "0",
+              "dType": "UDINT",
+              "name": "Digital Inputs",
+              "bitLength": 32,
+              "tableData": {
+                "id": 3
+              }
+            },
+            {
+              "index": "0x603F",
+              "subIndex": "0",
+              "dType": "UINT",
+              "name": "Error Code",
+              "bitLength": 16,
+              "tableData": {
+                "id": 4
+              }
+            },
+            {
+              "index": "0x6061",
+              "subIndex": "0",
+              "dType": "SINT",
+              "name": "Modes of Operation Display",
+              "bitLength": 8,
+              "tableData": {
+                "id": 5
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
