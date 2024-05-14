@@ -1,6 +1,6 @@
+#ifndef _ECAT_OD_H_
+#define _ECAT_OD_H_
 
-
-#pragma once
 
 #define OD_DEVICE_TYPE					0x1000,0X00  // RO: uint32_t
 #define OD_ERROR_REGISTER				0X1001,0X00  // RO: uint8_t Maxon EPOS4 Compact 50/5 \see ErrorRegisterBits struct 
@@ -231,3 +231,17 @@ xxxx xxxx x0xx 1000 | Fault
 
 /* CiA402 statemachine definition end */
 /*****************************************************************/
+
+
+
+
+
+
+
+
+
+
+
+
+
+#endif
