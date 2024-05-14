@@ -2,8 +2,8 @@
 *.css linguist-vendored
 *.c linguist-vendored=false
 *.h linguist-vendored=false
-*.cc linguist-vendored=false
-*.hpp linguist-vendored=false
+*.cc linguist-vendored
+*.hpp linguist-vendored
 *.sh linguist-vendored=false
 *.py linguist-vendored
 *.js linguist-vendored

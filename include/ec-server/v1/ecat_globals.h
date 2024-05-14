@@ -1,8 +1,8 @@
+#ifndef _ECAT_GLOBALS_H_
+#define _ECAT_GLOBALS_H_
 
-#pragma once
+#define _GNU_SOURCE
 
-#include <iostream>
-#include <cstring>
 #include <limits.h>
 #include <stdlib.h>
 #include <pthread.h>
@@ -18,18 +18,17 @@
 #include <sys/mman.h>
 #include <malloc.h>
 #include <sched.h>
-#include <chrono>
-#include <memory>
-#include <vector>
-#include <chrono>
-#include <thread>
+
+
+
+
 /****************************************************************************/
 // IgH EtherCAT library header file the user-space real-time interface library.
 // IgH, EtherCAT related functions and data types.
 #include "ecrt.h"  
      
 // Object dictionary paramaters PDO index and default values in here.
-#include "object_dictionary.h"  
+#include "ec-server/v1/object_dictionary.h"  
 
 /****************************************************************************/
                 /*** USER SHOULD DEFINE THIS AREAS ***/
@@ -38,7 +37,7 @@
 
 /// Number of connected servo drives. 
 /// @note If you are using custom slaves (not servo drives) this value must be different than NUM_OF_SLAVES.
-const uint32_t  g_kNumberOfServoDrivers = 4;   
+extern uint32_t  g_kNumberOfServoDrivers;   
 
 //const uint32_t  g_kNumberOfServoDriversTarget = 1;   
 
@@ -65,7 +64,7 @@ const uint32_t  g_kNumberOfServoDrivers = 4;
 #endif
 
 /// If you want to measure timings leave it as one, otherwise make it 0.
-#define MEASURE_TIMING         1    
+#define MEASURE_TIMING         0    
  /// set this to 1 if you want to use it in velocity mode (and set other modes 0)
 #define VELOCITY_MODE          0
 /// set this to 1 if you want to use it in position mode (and set other modes 0)  
@@ -90,7 +89,7 @@ const uint32_t  g_kNumberOfServoDrivers = 4;
 #define THIRTY_DEGREE_CCW    int(INC_PER_ROTATION/12)
 
 /// Nanoseconds per second.
-const uint32_t           g_kNsPerSec = 1000000000;     
+#define g_kNsPerSec 1000000000     
 #define PERIOD_NS       (g_kNsPerSec/FREQUENCY)  /// EtherCAT communication period in nanoseconds.
 #define PERIOD_US       (PERIOD_NS / 1000)      /// EtherCAT communication period in microseconds.
 #define PERIOD_MS       (PERIOD_US / 1000)      /// EtherCAT communication period in milliseconds.
@@ -99,7 +98,7 @@ const uint32_t           g_kNsPerSec = 1000000000;
 #endif
 /****************************************************************************/
 //// Global variable declarations, definitions are in @file ethercat_node.cpp
-static volatile sig_atomic_t sig = 1;
+extern sig_atomic_t sig;
 extern ec_master_t        * g_master ;  /// EtherCAT master
 extern ec_master_state_t    g_master_state ; /// EtherCAT master state
 
@@ -107,7 +106,7 @@ extern ec_domain_t       * g_master_domain ; /// Ethercat data passing master do
 extern ec_domain_state_t   g_master_domain_state ;   /// EtherCAT master domain state
 
 extern struct timespec      g_sync_timer ;                       /// timer for DC sync .
-const struct timespec       g_cycle_time = {0, PERIOD_NS} ;      /// cycletime settings in ns. 
+extern const struct timespec       g_cycle_time;      /// cycletime settings in ns. 
 extern uint32_t             g_sync_ref_counter;                  /// To sync every cycle.
 
 /****************************************************************************/
@@ -127,23 +126,7 @@ extern uint32_t             g_sync_ref_counter;                  /// To sync eve
  * @param time2 Timespec struct 2
  * @return Addition result
  */
-inline struct timespec timespec_add(struct timespec time1, struct timespec time2)
-{
-    struct timespec result;
-
-    if ((time1.tv_nsec + time2.tv_nsec) >= g_kNsPerSec)
-    {
-        result.tv_sec = time1.tv_sec + time2.tv_sec + 1;
-        result.tv_nsec = time1.tv_nsec + time2.tv_nsec - g_kNsPerSec;
-    }
-    else
-    {
-        result.tv_sec = time1.tv_sec + time2.tv_sec;
-        result.tv_nsec = time1.tv_nsec + time2.tv_nsec;
-    }
-
-    return result;
-}
+struct timespec timespec_add(struct timespec time1, struct timespec time2);
 
  /// Class states.
 enum LifeCycleState
@@ -195,15 +178,15 @@ typedef struct DataReceived
 
 #if POSITION_MODE
     // for position mode
-    std::vector<uint16_t> status_word ;
-    std::vector<int32_t>  actual_pos ;
-    std::vector<int32_t>  actual_vel ;
-    std::vector<uint32_t>  digital_in;
-    std::vector<uint16_t> error_code ;
-    std::vector<int8_t>   op_mode_display ;
+    uint16_t status_word[NUM_OF_SLAVES];
+    int32_t  actual_pos[NUM_OF_SLAVES];
+    int32_t  actual_vel[NUM_OF_SLAVES];
+    uint32_t  digital_in[NUM_OF_SLAVES];
+    uint16_t error_code[NUM_OF_SLAVES];
+    int8_t   op_mode_display[NUM_OF_SLAVES];
 #endif
-    DataReceived(){};
-};
+
+}DataReceived;
 
 /// Structure for data to be sent to slaves.
 typedef struct DataSent
@@ -218,13 +201,13 @@ typedef struct DataSent
 
 #if POSITION_MODE
     // for position mode
-    std::vector<uint16_t>  control_word ;
-    std::vector<int32_t>   target_pos ;
-    std::vector<uint32_t>  profile_vel;
-    std::vector<uint32_t>  digital_out;
-    std::vector<int8_t>    op_mode ;
+    uint16_t  control_word[NUM_OF_SLAVES] ;
+    int32_t   target_pos[NUM_OF_SLAVES] ;
+    uint32_t  profile_vel[NUM_OF_SLAVES];
+    uint32_t  digital_out[NUM_OF_SLAVES];
+    int8_t    op_mode[NUM_OF_SLAVES];
 
-    std::vector<int8_t> homing_method;
+    int8_t homing_method[NUM_OF_SLAVES];
 #endif
 
 //    std::vector<int32_t>   target_vel ;
@@ -233,8 +216,8 @@ typedef struct DataSent
 //    OpMode    op_mode ;
 //    std::vector<int32_t>   vel_offset ;
 //    std::vector<int16_t>   tor_offset ;
-    DataSent(){};
-};
+    
+}DataSent;
 
 
 /// CIA 402 state machine motor states
@@ -294,7 +277,7 @@ enum ControlStructureBits{
 };
 
 /// offset for PDO entries to register PDOs.
-typedef struct
+typedef struct OffsetPDO
 {
     uint32_t target_pos ;
     uint32_t target_vel ;
@@ -333,26 +316,26 @@ typedef struct
 
 
 /// EtherCAT SDO request structure for configuration phase.
-typedef struct
+typedef struct SdoRequest
 {
-    ec_sdo_request * profile_acc ;    
-    ec_sdo_request * profile_dec ;      
-    ec_sdo_request * profile_vel ;  
-    ec_sdo_request * quick_stop_dec ;
-    ec_sdo_request * motion_profile_type ;
-    ec_sdo_request * max_profile_vel ;
-    ec_sdo_request * max_fol_err ;
-    ec_sdo_request * speed_for_switch_search;
-    ec_sdo_request * speed_for_zero_search;
-    ec_sdo_request * homing_acc;
-    ec_sdo_request * curr_threshold_homing;
-    ec_sdo_request * home_offset;
-    ec_sdo_request * homing_method;		
+    ec_sdo_request_t * profile_acc ;    
+    ec_sdo_request_t * profile_dec ;      
+    ec_sdo_request_t * profile_vel ;  
+    ec_sdo_request_t * quick_stop_dec ;
+    ec_sdo_request_t * motion_profile_type ;
+    ec_sdo_request_t * max_profile_vel ;
+    ec_sdo_request_t * max_fol_err ;
+    ec_sdo_request_t * speed_for_switch_search;
+    ec_sdo_request_t * speed_for_zero_search;
+    ec_sdo_request_t * homing_acc;
+    ec_sdo_request_t * curr_threshold_homing;
+    ec_sdo_request_t * home_offset;
+    ec_sdo_request_t * homing_method;		
 } SdoRequest ;
 
 
 /// Parameters that should be specified in position mode.
-typedef struct 
+typedef struct ProfilePosParam
 {
     uint32_t profile_vel ;
     uint32_t profile_acc ;
@@ -365,7 +348,7 @@ typedef struct
     uint32_t homing_speed_zero;
     uint32_t homing_speed_switch;
 
-    int32_t homing_offset_switch[g_kNumberOfServoDrivers];
+    int32_t homing_offset_switch[NUM_OF_SLAVES];
 
     uint32_t p_gain;
     uint32_t i_gain;
@@ -400,12 +383,12 @@ typedef struct
  * @brief Struct containing 'velocity control parameter set' 0x30A2
  * Has 4 sub index. Default values are from EPOS4 firmware manual.
  */
- typedef struct
+ typedef struct VelControlParam
  {
-    uint32_t Pgain = 20000;     // micro amp sec per radian
-    uint32_t Igain = 500000;    // micro amp per radian
-    uint32_t FFVelgain = 0;
-    uint32_t FFAccgain = 0;
+    uint32_t Pgain;     // micro amp sec per radian
+    uint32_t Igain;    // micro amp per radian
+    uint32_t FFVelgain;
+    uint32_t FFAccgain;
  } VelControlParam;
 
 /**
@@ -541,6 +524,7 @@ enum ErrorType
     AUTO_TUNING_SENSOR_SIGNAL_ERROR = 0XFF24
 };
 
+/*
 static std::string GetErrorMessage(const int& err_code)
 {
     switch (err_code)
@@ -691,3 +675,12 @@ static std::string GetErrorMessage(const int& err_code)
             return "Unknown error";
     }
 }
+
+*/
+
+#define MAX_STATUS_STRLEN 8
+#define MAX_POSITION_STRLEN 32
+#define MAX_BUFF 1024 * 10
+
+
+#endif

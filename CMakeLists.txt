@@ -19,7 +19,7 @@ find_package(Threads REQUIRED)
 ## Defining paths and libraries to include in the next section.
 if(BUILD_DEB64)
   set(etherlab_include ethercat/include)
-  set(etherlab_lib ethercat/lib)
+  set(etherlab_lib ethercat/lib/.libs)
 elseif(BUILD_JETSON)
   set(etherlab_include /usr/local/include)
   set(etherlab_lib /usr/local/lib)
@@ -43,18 +43,15 @@ set(node_name "ecat_node")
 
 if(NOT DEFINED BUILD_TEST)
   file(GLOB ecat_node_SRC
-      "src/*.cc"
-      "agvethcat/sock/sock.cc"
-      "agvethcat/utils/*.cc"
+      "src/ec-server/v1/*.c"
   )
 
   file(GLOB ecat_req_SRC
-      "agvethcat/request/*.cc"
-      "agvethcat/utils/*.cc"
+      "src/ec-client/v1/request/*.c"
   )
 
   file(GLOB ecat_cli_SRC
-      "agvethcat/cmd/*.cc"
+      "src/ec-client/v1/cmd/*.c"
   )
 else()
   file(GLOB ecat_node_SRC
@@ -84,30 +81,30 @@ link_directories(
   ${etherlab_lib}
 )
 
-add_library(ecat_request
+add_library(ecrequest
   SHARED
   ${ecat_req_SRC}
 )
 
 
-add_executable(ecat_cmd ${ecat_cli_SRC})
+add_executable(ecctl ${ecat_cli_SRC})
 
 
-add_executable(ecat_node ${ecat_node_SRC})
+add_executable(ecserver ${ecat_node_SRC})
 
 
 
 ## Specifying libraries by using definitions above.
 
 target_link_libraries(
-  ecat_cmd
+  ecctl
   PRIVATE
-  ecat_request
+  ecrequest
 )
 
 if(NOT DEFINED BUILD_TEST)
   target_link_libraries(
-    ecat_node
+    ecserver
     PRIVATE
     ethercat 
     Threads::Threads
@@ -127,5 +124,5 @@ endif()
 ## Don't forget to add dependencies to your build file, 
 ## Use find_package(x) then add dependecy for x. 
 
-install(TARGETS ecat_node
+install(TARGETS ecserver
   DESTINATION build/${PROJECT_NAME})

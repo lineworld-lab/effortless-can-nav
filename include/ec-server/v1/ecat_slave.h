@@ -1,30 +1,14 @@
+#ifndef _ECAT_SLAVE_H_
+#define _ECAT_SLAVE_H_
 
-#pragma once
-
-#include "ecat_globals.h"
+#include "ec-server/v1/ecat_globals.h"
 
 
-/**
- *  \class   EthercatSlave
- *  \brief   Contains EtherCAT slave parameters for configuration.
- */
-class EthercatSlave
-{
-    public:
-        EthercatSlave();
-        ~EthercatSlave();
-    /**
-     * @brief This function will check slave's application layer states.
-     *        (INIT/PREOP/SAFEOP/OP) 
-     * @note This function shouldn't be called in real time context.For diagnosis 
-     *       you can use CheckDomainState() encapsulation in ecat_node.
-     * @return 0 if succesful. 
-     */
-    int CheckSlaveConfigState();
 
+typedef struct EthercatSlave {
  
     /// DC sync shift setting, zero will give best synchronization.
-    const static uint32_t   kSync0_shift_ = 0;
+    uint32_t   kSync0_shift_;
 
     /// Slave configuration parameters, assinged to each slave.
     ec_slave_config_t       * slave_config_ ;
@@ -62,4 +46,20 @@ class EthercatSlave
     // Slave homing parameters. 
     HomingParam             homing_param_ ;
 
-};// EthercatSlave class
+
+} EthercatSlave;
+
+
+
+
+int ECslave_init(EthercatSlave* ecs);
+
+
+int ECslave_destroy(EthercatSlave* ecs);
+
+
+int ECslave_CheckSlaveConfigState(EthercatSlave* ecs);
+
+
+
+#endif
