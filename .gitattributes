@@ -4,6 +4,7 @@
 *.h linguist-vendored=false
 *.cc linguist-vendored
 *.hpp linguist-vendored
+*.cpp linguist-vendored
 *.sh linguist-vendored=false
 *.py linguist-vendored
 *.js linguist-vendored
