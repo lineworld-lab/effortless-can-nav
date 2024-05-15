@@ -55,18 +55,18 @@ if(NOT DEFINED BUILD_TEST)
   )
 else()
   file(GLOB ecat_node_SRC
-    "agvethcat/test/*.cc"
-    "agvethcat/sock/test.cc"
-    "agvethcat/utils/*.cc"
+    "agvethcat/test/*.c"
+    "agvethcat/sock/test.c"
+    "agvethcat/utils/*.c"
   )
 
   file(GLOB ecat_req_SRC
-    "agvethcat/request/*.cc"
-    "agvethcat/utils/*.cc"
+    "agvethcat/request/*.c"
+    "agvethcat/utils/*.c"
   )
 
   file(GLOB ecat_cli_SRC
-    "agvethcat/cmd/*.cc"
+    "agvethcat/cmd/*.c"
   )
 
 endif()
