@@ -185,8 +185,8 @@ int EClife_SetComThreadPriorities(EthercatLifeCycle* eclc){
 
     cpu_set_t mask;
     CPU_ZERO(&mask);
-    CPU_SET(4, &mask);
-    CPU_SET(5, &mask);
+    CPU_SET(2, &mask);
+    CPU_SET(3, &mask);
 
     int result = sched_setaffinity(0, sizeof(mask), &mask);
     /**********************************************************************************************/
