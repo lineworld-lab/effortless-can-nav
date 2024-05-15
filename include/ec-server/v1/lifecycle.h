@@ -1,7 +1,7 @@
 #ifndef _ECAT_LIFECYCLE_H_
 #define _ECAT_LIFECYCLE_H_
 
-#include "ec-server/v1/ecat_node.h"
+#include "ec-server/v1/node.h"
 //#include "timing.h"
 /******************************************************************************/
 
@@ -119,21 +119,6 @@ int EClife_EnableDrivers(EthercatLifeCycle* eclc);
 int EClife_SetConfigurationParameters(EthercatLifeCycle* eclc);
 
 
-
 extern EthercatLifeCycle* ECAT_LIFECYCLE_NODE;
-
-
-int GetHomingStatusByAxis(char* res, int axis);
-
-int GetPositionByAxis(char* res, int axis);
-
-int PostHomeShiftByAxis(char* res, int axis, int shift);
-
-int PostPositionByAxis(char* res, int axis, int pos);
-
-int PostPositionWithFeedbackByAxis(char* res, int axis, int pos);
-
-int PostPositionWithStatusFeedbackByAxis(char* res, int axis, int pos);
-
 
 #endif
