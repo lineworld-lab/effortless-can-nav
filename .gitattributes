@@ -8,3 +8,7 @@
 *.sh linguist-vendored=false
 *.py linguist-vendored
 *.js linguist-vendored
+
+*.cc -linguist-detectable
+*.cpp -linguist-detectable
+*.hpp -linguist-detectable
