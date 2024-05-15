@@ -1,3 +1,4 @@
+#include "ec-server/v1/lifecycle.h"
 #include "ec-server/v1/sock.h"
 
 
@@ -288,4 +289,122 @@ void ExitServer(int client_sock, int server_fd){
     printf("successfully closed server");
 
 
+}
+
+
+
+
+
+int GetHomingStatusByAxis(char* res, int axis){
+
+
+    int op_mode = (int)ECAT_LIFECYCLE_NODE->op_mode_[axis];
+
+    int feedback = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+
+    char status_str[10] = {0};
+    /*
+
+    if(op_mode != 1 && feedback != 0){
+
+        status_str = std::to_string(0);
+
+    } else if (op_mode != 1 && feedback == 0){
+
+        status_str = std::to_string(-1);
+
+    } else if (op_mode == 1 && feedback != 0){
+
+        status_str = std::to_string(-2);
+
+    } else if (op_mode == 1 && feedback == 0){
+
+        status_str = std::to_string(1);
+
+    } 
+
+    */
+
+
+   if(op_mode == 1 && feedback == 0){
+  
+        strcpy(status_str, "1");
+
+   } else {
+
+        strcpy(status_str, "0");
+   }
+
+
+    strcpy(res, status_str);
+
+
+    return 0;
+}
+
+int PostHomeShiftByAxis(char* res, int axis, int shift){
+
+
+
+
+    return 0;
+}
+
+
+int PostPositionByAxis(char* res, int axis, int pos){
+
+    int32_t pos_32 = (int32_t)pos;
+
+    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+
+    strcpy(res, "0");
+
+    return 0;
+}
+
+
+int PostPositionWithFeedbackByAxis(char* res, int axis, int pos){
+
+    int32_t pos_32 = (int32_t)pos;
+
+    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+
+    int feedback = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+
+    char feedback_str[MAX_POSITION_STRLEN] = {0};
+
+    sprintf(feedback_str, "%d", feedback);
+
+    strcpy(res, feedback_str);
+
+    return 0;
+}
+
+
+
+
+int PostPositionWithStatusFeedbackByAxis(char* res, int axis, int pos){
+
+    int32_t pos_32 = (int32_t)pos;
+
+    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+
+    int status_int = (int)ECAT_LIFECYCLE_NODE->op_mode_[axis];
+
+    int feedback_int = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+
+    char status_str[MAX_STATUS_STRLEN] = {0};
+    char feedback_str[MAX_POSITION_STRLEN] = {0};
+
+    sprintf(status_str, "%d", status_int);
+
+    sprintf(feedback_str, "%d", feedback_int);
+
+    strcat(res, status_str);
+
+    strcat(res, " ");
+
+    strcat(res, feedback_str);
+
+    return 0;
 }

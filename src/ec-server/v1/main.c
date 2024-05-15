@@ -1,5 +1,6 @@
-#include "ec-server/v1/ecat_node.h"
-#include "ec-server/v1/ecat_lifecycle.h"
+#include "ec-server/v1/node.h"
+#include "ec-server/v1/lifecycle.h"
+#include "ec-server/v1/sock.h"
 
 
 sig_atomic_t sig = 1;
@@ -50,18 +51,18 @@ int main(int argc, char **argv){
     }
 
     int server_stat = 0 ;
-/*
+
     server_stat = ListenAndServe(SOCK_PORT);
 
 
     if(server_stat < 0 ){
-        fLog<std::string>("server failure");
+        printf("server failure");
 
-        ECAT_LIFECYCLE_NODE->on_shutdown();
+        EClife_on_shutdown(ECAT_LIFECYCLE_NODE);
 
         exit(EXIT_FAILURE);
     }
-*/
+
 
     return 0;
 }

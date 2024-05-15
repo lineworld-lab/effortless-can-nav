@@ -1,8 +1,8 @@
 #ifndef _ECAT_NODE_H_
 #define _ECAT_NODE_H_
 
-#include "ec-server/v1/ecat_globals.h"
-#include "ec-server/v1/ecat_slave.h"
+#include "ec-server/v1/core.h"
+#include "ec-server/v1/slave.h"
 
 
 

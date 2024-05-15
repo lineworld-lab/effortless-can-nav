@@ -1,4 +1,4 @@
-#include "ec-server/v1/ecat_slave.h"
+#include "ec-server/v1/slave.h"
 
 int ECslave_CheckSlaveConfigState(EthercatSlave* ecs){
 

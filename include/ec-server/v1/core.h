@@ -43,7 +43,7 @@ extern uint32_t  g_kNumberOfServoDrivers;
 
 #define PREEMPT_RT_MODE 1
 
-#define HOMING_AT_START 1
+#define HOMING_AT_START 0
 
 /// If you have EtherCAT slave different than CiA402 supported motor drive, set this macro to 1
 /// @note  That you'll have to manually specify PDO mapping for your custom slave.
@@ -108,6 +108,7 @@ extern ec_domain_state_t   g_master_domain_state ;   /// EtherCAT master domain 
 extern struct timespec      g_sync_timer ;                       /// timer for DC sync .
 extern const struct timespec       g_cycle_time;      /// cycletime settings in ns. 
 extern uint32_t             g_sync_ref_counter;                  /// To sync every cycle.
+
 
 /****************************************************************************/
 #define TEST_BIT(NUM,N)    ((NUM &  (1 << N))>>N)  /// Check specific bit in the data. 0 or 1.

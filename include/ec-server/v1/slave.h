@@ -1,7 +1,7 @@
 #ifndef _ECAT_SLAVE_H_
 #define _ECAT_SLAVE_H_
 
-#include "ec-server/v1/ecat_globals.h"
+#include "ec-server/v1/core.h"
 
 
 

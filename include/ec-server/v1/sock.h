@@ -2,7 +2,7 @@
 #define _ECAT_SOCK_H_
 
 
-#include "ec-server/v1/ecat_globals.h"
+#include "ec-server/v1/core.h"
 
 
 #include <netinet/in.h>
@@ -24,6 +24,18 @@ int ListenAndServe(int port);
 int ProcessBuffer(char* res, char* req);
 
 void ExitServer(int client_sock, int server_fd);
+
+int GetHomingStatusByAxis(char* res, int axis);
+
+int GetPositionByAxis(char* res, int axis);
+
+int PostHomeShiftByAxis(char* res, int axis, int shift);
+
+int PostPositionByAxis(char* res, int axis, int pos);
+
+int PostPositionWithFeedbackByAxis(char* res, int axis, int pos);
+
+int PostPositionWithStatusFeedbackByAxis(char* res, int axis, int pos);
 
 
 

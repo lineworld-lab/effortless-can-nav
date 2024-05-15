@@ -1,4 +1,4 @@
-#include "ec-server/v1/ecat_node.h"
+#include "ec-server/v1/node.h"
 
 
 int ECnode_ConfigureMaster(EthercatNode* ecn){
