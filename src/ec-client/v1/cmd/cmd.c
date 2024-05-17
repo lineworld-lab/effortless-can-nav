@@ -217,6 +217,8 @@ int SendTo(char* res, int arg_len, char** runtime_args){
 
         AxisReq ar;
 
+        memset(&ar, 0, sizeof(AxisReq));
+
         fgets(new_buff, 1024, stdin);
 
         printf("fgets: %s\n", new_buff);
