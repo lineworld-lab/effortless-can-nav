@@ -26,6 +26,8 @@ int main(int argc, char **argv){
 
     SetRealTimeSettings();
 
+    memset(ECAT_LIFECYCLE_NODE, 0, sizeof(EthercatLifeCycle));
+
     EClife_init(ECAT_LIFECYCLE_NODE);
 
 #if HOMING_AT_START

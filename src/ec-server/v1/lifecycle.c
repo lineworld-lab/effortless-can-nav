@@ -3,9 +3,11 @@
 
 int EClife_init(EthercatLifeCycle* eclc){
 
-    eclc->ecat_node_ = (EthercatNode*)malloc(sizeof(EthercatNode));
+    EthercatNode* new_ecn = (EthercatNode*)malloc(sizeof(EthercatNode));
 
-    memset(eclc->ecat_node_, 0, sizeof(EthercatNode));
+    memset(new_ecn, 0, sizeof(EthercatNode));
+    
+    eclc->ecat_node_ = new_ecn;
 
 #if CYCLIC_POSITION_MODE
     // for syncronous cyclic position mode
