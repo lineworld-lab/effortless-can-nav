@@ -237,7 +237,7 @@ int ProcessBuffer(char* res, char* req){
         status = PostPositionWithStatusFeedbackByAxis(res,  axis, pos);
     
     
-    } else if (action == "DIEBRO"){
+    } else if (strcmp(action,"DIEBRO") == 0){
 
         printf("DIEBRO received\n");
 
@@ -298,9 +298,9 @@ void ExitServer(int client_sock, int server_fd){
 int GetHomingStatusByAxis(char* res, int axis){
 
 
-    int op_mode = (int)ECAT_LIFECYCLE_NODE->op_mode_[axis];
+    int op_mode = (int)ECAT_LIFECYCLE_NODE.op_mode_[axis];
 
-    int feedback = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+    int feedback = (int)ECAT_LIFECYCLE_NODE.feedback_position_[axis];
 
     char status_str[10] = {0};
     /*
@@ -355,7 +355,7 @@ int PostPositionByAxis(char* res, int axis, int pos){
 
     int32_t pos_32 = (int32_t)pos;
 
-    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+    ECAT_LIFECYCLE_NODE.posted_position_[axis] = pos_32;
 
     strcpy(res, "0");
 
@@ -367,9 +367,9 @@ int PostPositionWithFeedbackByAxis(char* res, int axis, int pos){
 
     int32_t pos_32 = (int32_t)pos;
 
-    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+    ECAT_LIFECYCLE_NODE.posted_position_[axis] = pos_32;
 
-    int feedback = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+    int feedback = (int)ECAT_LIFECYCLE_NODE.feedback_position_[axis];
 
     char feedback_str[MAX_POSITION_STRLEN] = {0};
 
@@ -387,11 +387,11 @@ int PostPositionWithStatusFeedbackByAxis(char* res, int axis, int pos){
 
     int32_t pos_32 = (int32_t)pos;
 
-    ECAT_LIFECYCLE_NODE->posted_position_[axis] = pos_32;
+    ECAT_LIFECYCLE_NODE.posted_position_[axis] = pos_32;
 
-    int status_int = (int)ECAT_LIFECYCLE_NODE->op_mode_[axis];
+    int status_int = (int)ECAT_LIFECYCLE_NODE.op_mode_[axis];
 
-    int feedback_int = (int)ECAT_LIFECYCLE_NODE->feedback_position_[axis];
+    int feedback_int = (int)ECAT_LIFECYCLE_NODE.feedback_position_[axis];
 
     char status_str[MAX_STATUS_STRLEN] = {0};
     char feedback_str[MAX_POSITION_STRLEN] = {0};

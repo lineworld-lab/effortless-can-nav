@@ -16,7 +16,7 @@ uint32_t             g_sync_ref_counter;                  /// To sync every cycl
 
 uint32_t  g_kNumberOfServoDrivers = NUM_OF_SLAVES;   
 
-EthercatLifeCycle* ECAT_LIFECYCLE_NODE;
+EthercatLifeCycle ECAT_LIFECYCLE_NODE;
 
 void signalHandler();
 void SetRealTimeSettings();
@@ -26,7 +26,9 @@ int main(int argc, char **argv){
 
     SetRealTimeSettings();
 
-    EClife_init(ECAT_LIFECYCLE_NODE);
+    memset(&ECAT_LIFECYCLE_NODE, 0, sizeof(EthercatLifeCycle));
+
+    EClife_init(&ECAT_LIFECYCLE_NODE);
 
 #if HOMING_AT_START
 
@@ -37,16 +39,16 @@ int main(int argc, char **argv){
 #else
 
     //  ecat_lifecycle_node->zeroed_all_ = 1;
-    ECAT_LIFECYCLE_NODE->homed_all_ = 1;
+    (&ECAT_LIFECYCLE_NODE)->homed_all_ = 1;
 
 
 #endif
 
-    if(EClife_on_configure(ECAT_LIFECYCLE_NODE)){
+    if(EClife_on_configure(&ECAT_LIFECYCLE_NODE)){
         return -1;
     }
 
-    if(EClife_on_activate(ECAT_LIFECYCLE_NODE)){
+    if(EClife_on_activate(&ECAT_LIFECYCLE_NODE)){
         return -1;
     }
 
@@ -58,7 +60,7 @@ int main(int argc, char **argv){
     if(server_stat < 0 ){
         printf("server failure");
 
-        EClife_on_shutdown(ECAT_LIFECYCLE_NODE);
+        EClife_on_shutdown(&ECAT_LIFECYCLE_NODE);
 
         exit(EXIT_FAILURE);
     }
@@ -73,7 +75,7 @@ void signalHandler(int /*signum*/){
     sig = 0;
     nanosleep((const struct timespec[]){0,g_kNsPerSec},NULL);
 
-    EClife_on_shutdown(ECAT_LIFECYCLE_NODE);
+    EClife_on_shutdown(&ECAT_LIFECYCLE_NODE);
 
     exit(0);
 }
@@ -83,7 +85,7 @@ void signalKillHandler(int /*signum*/){
     sig = 0;
     nanosleep((const struct timespec[]){0,g_kNsPerSec},NULL);
 
-    EClife_on_shutdown(ECAT_LIFECYCLE_NODE);
+    EClife_on_shutdown(&ECAT_LIFECYCLE_NODE);
 
     exit(0);
 }

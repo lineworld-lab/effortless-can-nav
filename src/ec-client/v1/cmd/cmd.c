@@ -92,7 +92,7 @@ int RunInteractive(){
 
             printf("%s\n", res);
 
-        }else if(runtime_args[0] == "send"){
+        }else if(strcmp(runtime_args[0],"send") == 0){
 
             char res[MAX_RESULT_STRLEN] = {0};
 
@@ -108,7 +108,7 @@ int RunInteractive(){
 
             printf("%s\n", res);
 
-        } else if(runtime_args[0] == "disconnect"){
+        } else if(strcmp(runtime_args[0], "disconnect") == 0){
 
             char res[MAX_RESULT_STRLEN] = {0};
 
@@ -184,18 +184,17 @@ int SendTo(char* res, int arg_len, char** runtime_args){
 
     int ret_code;
 
+    printf("\'abort\' to abort;\n");
+    printf("\'send\' to send;\n");
+
     AxisReq var[MAX_ARG_LEN];
 
     int var_count = 0;
 
     memset(var, 0, sizeof(AxisReq) * MAX_ARG_LEN);
 
-    printf("\'abort\' to abort;\n");
-    printf("\'send\' to send;\n");
-
-
-
     for (;;){
+
 
         char new_buff[1024] = {0};
 
@@ -218,7 +217,11 @@ int SendTo(char* res, int arg_len, char** runtime_args){
 
         AxisReq ar;
 
+        memset(&ar, 0, sizeof(AxisReq));
+
         fgets(new_buff, 1024, stdin);
+
+        printf("fgets: %s\n", new_buff);
 
         int in_buff_len = strlen(new_buff);
 
@@ -244,6 +247,7 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             printf("SEND.\n");
 
             ret_code = ECCmdGatewayAR(res, var_count, var);
+
 
             break;
 

@@ -119,6 +119,6 @@ int EClife_EnableDrivers(EthercatLifeCycle* eclc);
 int EClife_SetConfigurationParameters(EthercatLifeCycle* eclc);
 
 
-extern EthercatLifeCycle* ECAT_LIFECYCLE_NODE;
+extern EthercatLifeCycle ECAT_LIFECYCLE_NODE;
 
 #endif
