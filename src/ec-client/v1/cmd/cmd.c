@@ -92,7 +92,7 @@ int RunInteractive(){
 
             printf("%s\n", res);
 
-        }else if(runtime_args[0] == "send"){
+        }else if(strcmp(runtime_args[0],"send") == 0){
 
             char res[MAX_RESULT_STRLEN] = {0};
 
@@ -108,7 +108,7 @@ int RunInteractive(){
 
             printf("%s\n", res);
 
-        } else if(runtime_args[0] == "disconnect"){
+        } else if(strcmp(runtime_args[0], "disconnect") == 0){
 
             char res[MAX_RESULT_STRLEN] = {0};
 

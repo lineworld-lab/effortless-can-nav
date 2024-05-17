@@ -237,7 +237,7 @@ int ProcessBuffer(char* res, char* req){
         status = PostPositionWithStatusFeedbackByAxis(res,  axis, pos);
     
     
-    } else if (action == "DIEBRO"){
+    } else if (strcmpt(action,"DIEBRO") == 0){
 
         printf("DIEBRO received\n");
 
