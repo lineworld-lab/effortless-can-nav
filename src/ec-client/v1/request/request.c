@@ -306,8 +306,6 @@ int TryECCmdGatewayARFeedback(char* res, int ar_len, AxisReq* var){
 
         sprintf(axis_str, "%d", var[i].axis);
 
-        sprintf(axis_str, "%d", var[i].axis);
-
         strcat(send_buff, axis_str);
         strcat(send_buff, " ");
 
