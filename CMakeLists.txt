@@ -17,22 +17,12 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
 ## Defining paths and libraries to include in the next section.
-if(BUILD_DEB64)
-  set(etherlab_include ethercat/include)
-  set(etherlab_lib ethercat/lib/.libs)
-elseif(BUILD_JETSON)
-  set(etherlab_include /usr/local/include)
-  set(etherlab_lib /usr/local/lib)
-elseif(BUILD_RPI3)
-  set(etherlab_include /usr/include/etherlab)
-  set(etherlab_lib /usr/lib)
-elseif(BUILD_RPI4)
-  set(etherlab_include /usr/include)
-  set(etherlab_lib /usr/lib)
-else()
-  set(etherlab_include /usr/include)
-  set(etherlab_lib /usr/lib)
-endif()
+
+set(etherlab_include vendor/ethercat/include)
+set(etherlab_lib vendor/ethercat/lib/.libs)
+
+set(cjson_include vendor/cJSON)
+
 set(ecat_node_include ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 set(node_name "ecat_node")
 
@@ -41,35 +31,25 @@ set(node_name "ecat_node")
 
 ## Output executable name and requied cpp files for executable
 
-if(NOT DEFINED BUILD_TEST)
-  file(GLOB ecat_node_SRC
-      "src/ec-server/v1/*.c"
-  )
 
-  file(GLOB ecat_req_SRC
-      "src/ec-client/v1/request/*.c"
-  )
+file(GLOB ecat_node_SRC
+    "src/ec-server/v1/*.c"
+)
 
-  file(GLOB ecat_cli_SRC
-      "src/ec-client/v1/cmd/*.c"
-  )
-else()
-  file(GLOB ecat_node_SRC
-    "agvethcat/test/*.c"
-    "agvethcat/sock/test.c"
-    "agvethcat/utils/*.c"
-  )
+file(GLOB ecat_req_SRC
+    "src/ec-client/v1/request/*.c"
+)
 
-  file(GLOB ecat_req_SRC
-    "agvethcat/request/*.c"
-    "agvethcat/utils/*.c"
-  )
+file(GLOB ecat_cli_SRC
+    "src/ec-client/v1/cmd/*.c"
+)
 
-  file(GLOB ecat_cli_SRC
-    "agvethcat/cmd/*.c"
-  )
+file(GLOB cjson_SRC
+    "vendor/cJSON/cJSON.c"
+    "vendor/cJSON/cJSON_Utils.c"
+)
 
-endif()
+
 # Add include directories
 include_directories(
   ${etherlab_include}
@@ -86,6 +66,10 @@ add_library(ecrequest
   ${ecat_req_SRC}
 )
 
+add_library(cjson
+  SHARED
+  ${cjson_SRC}
+)
 
 add_executable(ecctl ${ecat_cli_SRC})
 
@@ -102,23 +86,15 @@ target_link_libraries(
   ecrequest
 )
 
-if(NOT DEFINED BUILD_TEST)
-  target_link_libraries(
-    ecserver
-    PRIVATE
-    ethercat 
-    Threads::Threads
-    rt
-  )
-else()
-  target_link_libraries(
-    ecat_node
-    PRIVATE
-    Threads::Threads
-    rt
-  )
+target_link_libraries(
+  ecserver
+  PRIVATE
+  ethercat
+  cjson 
+  Threads::Threads
+  rt
+)
 
-endif()
 
 
 ## Don't forget to add dependencies to your build file, 

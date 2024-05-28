@@ -1,0 +1,143 @@
+#!/bin/bash
+
+
+set -euo pipefail
+
+
+
+
+CMD="$1"
+
+
+
+ecsh_help () {
+
+
+    echo "ecsh: help"
+
+
+}
+
+
+
+ecsh_vendor () {
+
+
+    echo "ecsh: vendor"
+
+    cd vendor
+
+    # igh etherlab 
+
+    if [ -d "./ethercat" ]
+    then
+        sudo rm -r ./ethercat
+    fi
+
+    sudo apt update
+
+    sudo apt install -y linux-headers-$(uname -r) build-essential libtool automake tree dkms
+
+    git clone https://gitlab.com/etherlab.org/ethercat.git
+
+    cd ethercat
+
+    git switch -c stable-1.6 origin/stable-1.6
+
+    ./bootstrap 
+
+    ./configure --enable-generic --disable-8139too --disable-e100 --disable-e1000 --disable-e1000e --disable-igb --disable-r8169 --disable-ccat --enable-static=no --enable-shared=yes --enable-eoe=no --enable-cycles=no --enable-hrtimer=no --enable-regalias=no --enable-tool=yes --enable-userlib=yes --enable-sii-assign=yes --enable-rt-syslog=yes
+
+    make all modules 
+
+    cd ../
+
+    # cJSON
+
+    if [ -d "./cJSON" ]
+    then
+        sudo rm -r ./cJSON
+    fi
+
+    git clone https://github.com/DaveGamble/cJSON.git
+
+
+
+}
+
+
+
+
+ecsh_build(){
+
+
+    echo "ecsh: build"
+
+    if [ -d "./build" ]
+    then
+        rm -r ./build
+    fi
+
+    mkdir -p build
+
+    cd build
+
+    cmake  ..
+
+    make
+
+
+
+}
+
+
+
+ecsh_run(){
+
+
+    echo "ecsh: run"
+
+    if [ -d "./build" ]
+    then
+        echo "build doesn't exist"
+        exit -1
+    fi
+
+    cp -Rf ./config/config.json ./build
+
+    cd build && ./ecserver
+
+}
+
+
+
+if [ "$CMD" == "help" ]
+then 
+
+    ecsh_help
+
+elif [ "$CMD" == "vendor" ]
+then
+
+    ecsh_vendor
+
+elif [ "$CMD" == "build" ]
+then 
+
+    ecsh_build
+
+
+elif [ "$CMD" == "run" ]
+then
+
+    ecsh_run
+
+else 
+
+    echo "invalid cmd: $CMD"
+    exit -1
+
+
+fi
+
+

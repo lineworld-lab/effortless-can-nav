@@ -1,0 +1,2 @@
+ethercat: https://gitlab.com/etherlab.org/ethercat.git
+cJSON: https://github.com/DaveGamble/cJSON.git
