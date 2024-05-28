@@ -219,7 +219,7 @@ int ProcessBuffer(char* res, char* req){
     }
 
 
-    axis = sscanf(axis_str, "%d", &axis);
+    sscanf(axis_str, "%d", &axis);
 
     int status = 0;
 
