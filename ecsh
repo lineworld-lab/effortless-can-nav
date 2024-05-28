@@ -95,7 +95,9 @@ ecsh_build(){
 
 
 
+
 }
+
 
 
 
@@ -104,7 +106,7 @@ ecsh_run(){
 
     echo "ecsh: run"
 
-    if [ -d "./build" ]
+    if [ ! -d "./build" ]
     then
         echo "build doesn't exist"
         exit -1
