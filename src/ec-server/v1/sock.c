@@ -1,4 +1,4 @@
-#include "ec-server/v1/lifecycle.h"
+#include "ec-server/v1/ec_system.h"
 #include "ec-server/v1/sock.h"
 
 
