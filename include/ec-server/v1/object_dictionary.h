@@ -3,7 +3,7 @@
 
 
 #define OD_DEVICE_TYPE					0x1000,0X00  // RO: uint32_t
-#define OD_ERROR_REGISTER				0X1001,0X00  // RO: uint8_t Maxon EPOS4 Compact 50/5 \see ErrorRegisterBits struct 
+#define OD_ERROR_REGISTER				0X1001,0X00  // RO: uint8_t 
 #define OD_MANUFACTURER_DEVICE_NAME 	0X1008,0X00  // RO: VISIBLE_STRING
 #define OD_STORE_PARAMETERS				0X1010,0X00  // Check subindex
 #define OD_SAVE_ALL_PARAMETERS			0X1010,0X01  // RW: uint32_t 
@@ -73,8 +73,8 @@
 #define OD_CUSTOM_PERSISTENT_MEMORY_4		0X210C,0X04	 // RW: int32_t to store configuration values, up to 4 bytes.
 #define OD_POWER_SUPPLY_VOLTAGE				0X2200,0X01	 // RO: uint16_t 
 /// Object Dictionary for Axis configurations 
-#define OD_SENSOR_CONFIGURATION							0X3000,0X01	 // RW: uint32_t \see SensorConfig struct.
-#define OD_CONTROL_STRUCTURE 							0X3000,0X02  // RW: uint32_t \see IMPORTANT! EPOS4-Firmware-Specification pg. 139
+#define OD_SENSOR_CONFIGURATION							0X3000,0X01	 // RW: uint32_t 
+#define OD_CONTROL_STRUCTURE 							0X3000,0X02  // RW: uint32_t 
 // EOF OD_AXIS_CONFIURATIONS
 #define OD_MOTOR_DATA_NOMINAL_CURRENT					0X3001,0X01	 // RW: uint32_t  unit is mA
 #define OD_MOTOR_DATA_OUTPUT_CURRENT_LIMIT				0X3001,0X02	 // RW: uint32_t
@@ -85,7 +85,7 @@
 #define OD_GEAR_REDUCTION_DENOMINATOR					0X3003,0X02	 // RW: uint32_t
 #define OD_GEAR_MAX_INPUT_SPEED							0X3003,0X03  // RW: uint32_t
 #define OD_GEAR_MISC_CONFIGURATION						0X3003,0X04  // RW: uint32_t // Gear direction 0 normal 1 inverted.
-#define OD_DIGITAL_INCREMENTAL_ENCODER_1_TYPE			0X3010,0X02  // RW: uint16_t // pg. 157 EPOS4-Firmware-Specifications
+#define OD_DIGITAL_INCREMENTAL_ENCODER_1_TYPE			0X3010,0X02  // RW: uint16_t 
 
 #define OD_CURRENT_CONTROLLER_PGAIN						0X30A0,0X01   // RW: uint32_t
 #define OD_CURRENT_CONTROLLER_IGAIN						0X30A0,0X02   // RW: uint32_t
@@ -96,10 +96,10 @@
 #define OD_POSITION_CONTROLLER_FF_VEL_GAIN				0X30A1,0X04	  // RW: uint32_t
 #define OD_POSITION_CONTROLLER_FF_ACC_GAIN				0X30A1,0X05	  // RW: uint32_t
 
-#define OD_VELOCITY_CONTROLLER_PGAIN		      		0x30A2,0x01	  // RW: uint32_t  \see EPOS4-Firmware-Specification pg. 167
-#define OD_VELOCITY_CONTROLLER_IGAIN		      		0x30A2,0x02	  // RW: uint32_t  \see EPOS4-Firmware-Specification pg. 167
-#define OD_VELOCITY_CONTROLLER_FF_VEL_GAIN				0x30A2,0x03	  // RW: uint32_t  \see EPOS4-Firmware-Specification pg. 167
-#define OD_VELOCITY_CONTROLLER_FF_ACC_GAIN				0x30A2,0x04	  // RW: uint32_t  \see EPOS4-Firmware-Specification pg. 167
+#define OD_VELOCITY_CONTROLLER_PGAIN		      		0x30A2,0x01	  // RW: uint32_t  
+#define OD_VELOCITY_CONTROLLER_IGAIN		      		0x30A2,0x02	  // RW: uint32_t  
+#define OD_VELOCITY_CONTROLLER_FF_VEL_GAIN				0x30A2,0x03	  // RW: uint32_t 
+#define OD_VELOCITY_CONTROLLER_FF_ACC_GAIN				0x30A2,0x04	  // RW: uint32_t  
 
 #define OD_CONTROL_WORD             0x6040,0x00
 #define OD_STATUS_WORD              0x6041,0x00
@@ -128,7 +128,7 @@
 #define OD_VELOCITY_ENCODER_RESOLUTION_NUM      		0x6094,0x01
 #define OD_VELOCITY_ENCODER_RESOLUTION_DEN      		0x6094,0x02
 
-#define OD_INTERPOLATION_TIME_PERIOD 					0X60C2,0X01	 // RW: uint8_t   check EPOS4 Firmware Specification pg. 247
+#define OD_INTERPOLATION_TIME_PERIOD 					0X60C2,0X01	 // RW: uint8_t   
 #define OD_INTERPOLATION_TIME_UNIT						0X60C2,0X02  // RW: uint8_t   set this to -3(default) for ms unit.
 
 

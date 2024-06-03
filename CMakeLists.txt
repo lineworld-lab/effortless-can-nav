@@ -53,6 +53,7 @@ file(GLOB cjson_SRC
 # Add include directories
 include_directories(
   ${etherlab_include}
+  ${cjson_include}
   ${ecat_node_include}
 )
 

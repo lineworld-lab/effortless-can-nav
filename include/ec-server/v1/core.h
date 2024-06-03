@@ -20,8 +20,6 @@
 #include <sched.h>
 
 
-
-
 /****************************************************************************/
 // IgH EtherCAT library header file the user-space real-time interface library.
 // IgH, EtherCAT related functions and data types.
@@ -33,13 +31,15 @@
 /****************************************************************************/
                 /*** USER SHOULD DEFINE THIS AREAS ***/
 /// Total number of connected slave to the bus.
-#define NUM_OF_SLAVES     4 
+#define MAX_DRIVERS_NUM     16 
 
 /// Number of connected servo drives. 
-/// @note If you are using custom slaves (not servo drives) this value must be different than NUM_OF_SLAVES.
-extern uint32_t  g_kNumberOfServoDrivers;   
+/// @note If you are using custom slaves (not servo drives) this value must be different than MAX_DRIVERS_NUM.
+extern uint32_t  g_drivers_num;   
 
-//const uint32_t  g_kNumberOfServoDriversTarget = 1;   
+extern int32_t g_homing_offset_switch[MAX_DRIVERS_NUM];
+
+//const uint32_t  g_drivers_numTarget = 1;   
 
 #define PREEMPT_RT_MODE 1
 
@@ -94,7 +94,7 @@ extern uint32_t  g_kNumberOfServoDrivers;
 #define PERIOD_US       (PERIOD_NS / 1000)      /// EtherCAT communication period in microseconds.
 #define PERIOD_MS       (PERIOD_US / 1000)      /// EtherCAT communication period in milliseconds.
 #if CUSTOM_SLAVE
-    #define FINAL_SLAVE     (NUM_OF_SLAVES-1)
+    #define FINAL_SLAVE     (MAX_DRIVERS_NUM-1)
 #endif
 /****************************************************************************/
 //// Global variable declarations, definitions are in @file ethercat_node.cpp
@@ -130,7 +130,7 @@ extern uint32_t             g_sync_ref_counter;                  /// To sync eve
 struct timespec timespec_add(struct timespec time1, struct timespec time2);
 
  /// Class states.
-enum LifeCycleState
+enum LIFE_CYCLE_STATE
 {
     FAILURE = -1,
     SUCCESS,
@@ -138,7 +138,7 @@ enum LifeCycleState
 };
 
 /// SDO_data Structure holding all data needed to send an SDO object
-typedef struct {
+typedef struct SDO_DATA {
     uint16_t slave_position;    // Position based addressing.
     uint16_t index;		        // Index in Object dictionary
     uint8_t  sub_index;	        // Subindex in Object dictionary
@@ -146,22 +146,24 @@ typedef struct {
     size_t   data_sz;	        // Size
     size_t   result_sz;         // Resulted data size
     uint32_t err_code;	        // Error code
-} SDO_data;
+} SDO_DATA;
+
 /// Motor operation modes based on CiA402
-typedef enum OpMode
+
+typedef enum OP_MODE
 {
-    kProfilePosition = 1,
-    kProfileVelocity = 3,
-    kProfileTorque   = 4,
-    kHoming = 6,
-    kInterpolatedPosition = 7,
-    kCSPosition = 8,
-    kCSVelocity = 9,
-    kCSTorque = 10,
+    K_PROFILE_POSITION = 1,
+    K_PROFILE_VELOCITY = 3,
+    K_PROFILE_TORQUE   = 4,
+    K_HOMING = 6,
+    K_INTERPOLATED_POSITION = 7,
+    K_CS_POSITION = 8,
+    K_CS_VELOCITY = 9,
+    K_CS_TORQUE = 10,
 };
 
 /// Structure for data to be received from slaves.
-typedef struct DataReceived
+typedef struct DATA_RECEIVED
 {
     uint16_t  com_status;
 #if CYCLIC_POSITION_MODE 
@@ -179,18 +181,18 @@ typedef struct DataReceived
 
 #if POSITION_MODE
     // for position mode
-    uint16_t status_word[NUM_OF_SLAVES];
-    int32_t  actual_pos[NUM_OF_SLAVES];
-    int32_t  actual_vel[NUM_OF_SLAVES];
-    uint32_t  digital_in[NUM_OF_SLAVES];
-    uint16_t error_code[NUM_OF_SLAVES];
-    int8_t   op_mode_display[NUM_OF_SLAVES];
+    uint16_t status_word[MAX_DRIVERS_NUM];
+    int32_t  actual_pos[MAX_DRIVERS_NUM];
+    int32_t  actual_vel[MAX_DRIVERS_NUM];
+    uint32_t  digital_in[MAX_DRIVERS_NUM];
+    uint16_t error_code[MAX_DRIVERS_NUM];
+    int8_t   op_mode_display[MAX_DRIVERS_NUM];
 #endif
 
-}DataReceived;
+} DATA_RECEIVED;
 
 /// Structure for data to be sent to slaves.
-typedef struct DataSent
+typedef struct DATA_SENT
 {
     // for Syncronous Cyclic Position mode
 #if CYCLIC_POSITION_MODE 
@@ -202,13 +204,13 @@ typedef struct DataSent
 
 #if POSITION_MODE
     // for position mode
-    uint16_t  control_word[NUM_OF_SLAVES] ;
-    int32_t   target_pos[NUM_OF_SLAVES] ;
-    uint32_t  profile_vel[NUM_OF_SLAVES];
-    uint32_t  digital_out[NUM_OF_SLAVES];
-    int8_t    op_mode[NUM_OF_SLAVES];
+    uint16_t  control_word[MAX_DRIVERS_NUM] ;
+    int32_t   target_pos[MAX_DRIVERS_NUM] ;
+    uint32_t  profile_vel[MAX_DRIVERS_NUM];
+    uint32_t  digital_out[MAX_DRIVERS_NUM];
+    int8_t    op_mode[MAX_DRIVERS_NUM];
 
-    int8_t homing_method[NUM_OF_SLAVES];
+    int8_t homing_method[MAX_DRIVERS_NUM];
 #endif
 
 //    std::vector<int32_t>   target_vel ;
@@ -218,67 +220,42 @@ typedef struct DataSent
 //    std::vector<int32_t>   vel_offset ;
 //    std::vector<int16_t>   tor_offset ;
     
-}DataSent;
+}DATA_SENT;
 
 
 /// CIA 402 state machine motor states
-enum MotorStates{
-	kReadyToSwitchOn = 1,
-	kSwitchedOn,
-	kOperationEnabled,
-	kFault,
-	kVoltageEnabled,
-	kQuickStop,
-	kSwitchOnDisabled,
-	kWarning,
-	kRemote,
-	kTargetReached,
-	kInternalLimitActivate
+
+enum MOTOR_STATES{
+	K_READY_TO_SWITCH_ON = 1,
+	K_SWITCHED_ON,
+	K_OPERATION_ENABLED,
+	K_FAULT,
+	K_VOLTAGE_ENABLED,
+	K_QUICK_STOP,
+	K_SWITCH_ON_DISABLED,
+	K_WARNING,
+	K_REMOTE,
+	K_TARGET_REACHED,
+	K_INTERNAL_LIMIT_ACTIVATE
 };
 
 /// CiA402 Error register bits for error index.
 
-enum ErrorRegisterBits{
-    kGenericError = 0,
-    kCurrentError,
-    kVoltageError,
-    kTemperatureError,
-    kCommunicationError,
-    kDeviceProfileSpecificError,
-    kReserved,
-    kMotionError
-};
-/// Sensor Configuration for motor for more information \see EPOS4-Firmware-Specification pdf Pg.138
-/// on : https://www.maxongroup.com/medias/sys_master/root/8834324856862/EPOS4-Firmware-Specification-En.pdf
-enum SensorConfig{
-    kSensor1TypeNone=0,
-    kSensor1TypeDigitalIncrementalEncoder1=1,
-    kSensor2TypeNone=0, 
-    kSensor2TypeDigitalIncrementalEncoder2=256,
-    kSensor2TypeAnalogIncrementalEncoderSinCos=512,
-    kSensor2TypeSSIAbsoluteEncoder=768,
-    kSensor3TypeNone=0,
-    kSensor3TypeDigitalHallSensor=131072  //EC motors only 
 
+enum ERROR_REGISTER_BITS{
+    K_GENERIC_ERROR = 0,
+    K_CURRENT_ERROR,
+    K_VOLTAGE_ERROR,
+    K_TEMPERATURE_ERROR,
+    K_COMMUNICATION_ERROR,
+    K_DEVICE_PROFILE_SPECIFIC_ERROR,
+    K_RESERVED,
+    K_MOTION_ERROR
 };
 
-/// Control structure configuration for control mechanism to select sensor structure specific to hardware. \see EPOS4-Firmware-Specification pg. 140
-enum ControlStructureBits{
-    /// These are bit locations not values for values  \see EPOS4-Firmware-Specification pg. 140 !!!
-    kCurrentControlStructure  = 0,    // 0-3 , 4 bits. Val : 1 - PI current controller
-    kVelocityControlStructure = 4,   // 4-7,   4bits.  Val : 0 - None | 1 - PI Vecolity controller (low pass filter) | 2 - PI velocity controller (observer) 
-    kPositionControlStructure = 8,   // 8-11 , 4bits.  Val : 0 - None | 1 - PID position controller
-    kGearLocation             = 12,  // 1 bit          Val : 0 - None | 1 - Gear Mounted on system     
-    kProcessValueReference    = 14,  // 14-15 2 bits.  Val : 0 - On motor (or undefined) | 1 - On gear  
-    kMainSensor               = 16,  // 16-19 4 bits.  Val : 0 - None | 1 - Sensor 1  | 2 - Sensor 2 | 3 - Sensor 3
-    kAuxiliarySensor          = 20,  // 20-23 4 bits.  Val : 0 - None | 1 - Sensor 1  | 2 - Sensor 2 | 3 - Sensor 3
-    kMountingPositionSensor1  = 24,  // 24-25 2 bits.  Val : 0 - On motor (or undefined) | 1 - On gear 
-    kMountingPositionSensor2  = 26,  // 26-27 2 bits.  Val : 0 - On motor (or undefined) | 1 - On gear 
-    kMountingPositionSensor3  = 28,  // 28-29 2 bits.  Val : 0 - On motor 
-};
 
 /// offset for PDO entries to register PDOs.
-typedef struct OffsetPDO
+typedef struct PDO_OFFSET
 {
     uint32_t target_pos ;
     uint32_t target_vel ;
@@ -313,11 +290,11 @@ typedef struct OffsetPDO
 
     uint32_t emergency_switch;
     uint32_t pressure_sensor; 
-} OffsetPDO ;
+} PDO_OFFSET ;
 
 
 /// EtherCAT SDO request structure for configuration phase.
-typedef struct SdoRequest
+typedef struct SDO_REQUEST
 {
     ec_sdo_request_t * profile_acc ;    
     ec_sdo_request_t * profile_dec ;      
@@ -332,11 +309,11 @@ typedef struct SdoRequest
     ec_sdo_request_t * curr_threshold_homing;
     ec_sdo_request_t * home_offset;
     ec_sdo_request_t * homing_method;		
-} SdoRequest ;
+} SDO_REQUEST ;
 
 
 /// Parameters that should be specified in position mode.
-typedef struct ProfilePosParam
+typedef struct PROFILE_POS_PARAM
 {
     uint32_t profile_vel ;
     uint32_t profile_acc ;
@@ -349,83 +326,33 @@ typedef struct ProfilePosParam
     uint32_t homing_speed_zero;
     uint32_t homing_speed_switch;
 
-    int32_t homing_offset_switch[NUM_OF_SLAVES];
+    int32_t homing_offset_switch[MAX_DRIVERS_NUM];
 
     uint32_t p_gain;
     uint32_t i_gain;
     uint32_t d_gain;
-} ProfilePosParam ;
+} PROFILE_POS_PARAM ;
 
 
 
-/**
- * @brief Struct contains configuration parameters for cyclic sync. position mode.
- * 
- */
-typedef struct 
-{
-    uint32_t nominal_current ;
-    uint16_t torque_constant ;
-    uint32_t current_controller_gain ;
-    uint32_t position_control_parameter_set ;
-    uint32_t software_position_limit ; 
-    uint16_t motor_rated_torque ;
-    uint32_t max_gear_input_speed ; 
-    uint32_t profile_vel ;
-    uint32_t profile_acc ;
-    uint32_t profile_dec ;
-    uint32_t max_fol_err ;
-    uint32_t max_profile_vel ; 
-    uint32_t quick_stop_dec ;
-    uint32_t interpolation_time_period ;
-} CSPositionModeParam;
 
 /**
  * @brief Struct containing 'velocity control parameter set' 0x30A2
- * Has 4 sub index. Default values are from EPOS4 firmware manual.
+ * Has 4 sub index. 
  */
- typedef struct VelControlParam
+ typedef struct VELOCITY_CONTROL_PARAM
  {
-    uint32_t Pgain;     // micro amp sec per radian
-    uint32_t Igain;    // micro amp per radian
-    uint32_t FFVelgain;
-    uint32_t FFAccgain;
- } VelControlParam;
+    uint32_t p_gain;     // micro amp sec per radian
+    uint32_t i_gain;    // micro amp per radian
+    uint32_t ff_vel_gain;
+    uint32_t ff_acc_gain;
+ } VELOCITY_CONTROL_PARAM;
 
-/**
- * @brief Struct contains configuration parameters for cyclic sync. velocity mode.
- * 
- */
-typedef struct 
-{
-    VelControlParam velocity_controller_gain ;
-    uint32_t quick_stop_dec ;
-    uint32_t profile_dec ;
-    uint32_t software_position_limit ; 
-    uint32_t interpolation_time_period ;
-} CSVelocityModeParam ;
- 
- /**
- * @brief Struct contains configuration parameters for cyclic sync. torque mode.
- * 
- */
-typedef struct 
-{
-    uint32_t nominal_current ;
-    uint16_t torque_constant ;
-    uint32_t software_position_limit ; 
-    uint16_t motor_rated_torque ;
-    uint32_t max_gear_input_speed ; 
-    uint32_t profile_vel ;
-    uint32_t profile_acc ;
-    uint32_t profile_dec ;
-    uint32_t max_profile_vel ; 
-    uint32_t quick_stop_dec ;
-    uint32_t interpolation_time_period ;
-} CSTorqueModeParam ;
+
+
 
 /// Homing mode configuration parameters.
-typedef struct
+typedef struct HOMING_PARAM
 {
 	uint32_t	max_fol_err;
 	uint32_t	max_profile_vel;
@@ -438,19 +365,19 @@ typedef struct
     /// Amount to move away from the sensed limit	
 	int32_t		home_offset;
 	int8_t		homing_method;
-} HomingParam;
+} HOMING_PARAM;
 
 /// Profile velocity mode configuration parameters.
-typedef struct
+typedef struct PROFILE_VELOCITY_PARAM
 {
     uint32_t	max_profile_vel;
     uint32_t	quick_stop_dec;
     uint32_t	profile_acc;
     uint32_t	profile_dec;
     uint16_t    motion_profile_type;
-} ProfileVelocityParam ;
+} PROFILE_VELOCITY_PARAM ;
 
-enum ErrorType
+enum ERROR_TYPE
 {   
     NO_ERROR = 0,
     GENERIC_ERROR = 0x1000,
@@ -683,5 +610,7 @@ static std::string GetErrorMessage(const int& err_code)
 #define MAX_POSITION_STRLEN 32
 #define MAX_BUFF 1024 * 10
 
+
+extern int we_are_testing;
 
 #endif

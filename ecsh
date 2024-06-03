@@ -83,7 +83,7 @@ ecsh_build(){
 
     if [ -d "./build" ]
     then
-        rm -r ./build
+        sudo rm -r ./build
     fi
 
     mkdir -p build
@@ -115,7 +115,7 @@ ecsh_run(){
 
     cp -Rf ./config/config.json ./build
 
-    cd build && ./ecserver
+    cd build && sudo ./ecserver
 
 }
 

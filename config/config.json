@@ -1,5 +1,29 @@
 {
 
 
+    "drivers_num": 4,
+    "drivers":[
+
+        {
+            "id": 0,
+            "homing_offset": 65000
+        },
+        {
+            "id": 1,
+            "homing_offset": 300000
+        },
+        {
+            "id": 2,
+            "homing_offset": 392520
+        },
+        {
+            "id": 3,
+            "homing_offset": 255000
+        }
+
+    ],
+    "test": 0,
+    "homing_at_start": 0
+
     
 }
