@@ -1,3 +1,3 @@
 # libecat-bootstrap
 
-life is too beautiful to get harassed by your own implementation of EtherCAT protocol
+life is too beautiful to be harassed by implementing your own EtherCAT master
