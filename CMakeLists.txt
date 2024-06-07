@@ -10,7 +10,7 @@ endif()
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
-## Compile options for IgH libary and several Linux libraries (e.g lpthread)
+
 add_compile_options(-g -w -Wall -Wextra -Wpedantic)
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -18,23 +18,50 @@ find_package(Threads REQUIRED)
 
 ## Defining paths and libraries to include in the next section.
 
-set(etherlab_include vendor/ethercat/include)
-set(etherlab_lib vendor/ethercat/lib/.libs)
+if(ECRT)
+
+  set(etherlab_include vendor/ethercat/include)
+  set(etherlab_lib vendor/ethercat/lib/.libs)
+
+else()
+
+  set(etherlab_include 
+      
+    vendor/SOEM
+    vendor/SOEM/soem 
+    vendor/SOEM/osal
+    vendor/SOEM/osal/linux 
+    vendor/SOEM/oshw
+    vendor/SOEM/oshw/linux
+        
+        )
+  set(etherlab_lib vendor/SOEM/build)
+
+endif()
 
 set(cjson_include vendor/cJSON)
 
 set(ecat_node_include ${CMAKE_CURRENT_SOURCE_DIR}/include/)
 set(node_name "ecat_node")
 
-## Finding packages that'll be required for compilation.
-## Don't forget to add packages if you use it in your code, otherwise you'll get build errors.
 
-## Output executable name and requied cpp files for executable
+if(ECRT)
+
+  file(GLOB ecat_node_SRC
+      "src/ec-server/v1/*.c"
+  )
 
 
-file(GLOB ecat_node_SRC
-    "src/ec-server/v1/*.c"
-)
+else()
+
+  file(GLOB ecat_node_SRC
+      "src/ec-server/v2/*.c"
+  )
+
+
+endif()
+
+
 
 file(GLOB ecat_req_SRC
     "src/ec-client/v1/request/*.c"
@@ -87,19 +114,30 @@ target_link_libraries(
   ecrequest
 )
 
-target_link_libraries(
-  ecserver
-  PRIVATE
-  ethercat
-  cjson 
-  Threads::Threads
-  rt
-)
+
+if(ECRT)
+  target_link_libraries(
+    ecserver
+    PRIVATE
+    ethercat
+    cjson 
+    Threads::Threads
+    rt
+  )
+
+
+else()
+
+  target_link_libraries(
+    ecserver
+    PRIVATE
+    soem
+    cjson 
+    Threads::Threads
+    rt
+  )
+
+endif()
 
 
 
-## Don't forget to add dependencies to your build file, 
-## Use find_package(x) then add dependecy for x. 
-
-install(TARGETS ecserver
-  DESTINATION build/${PROJECT_NAME})

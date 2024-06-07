@@ -23,7 +23,69 @@ ecsh_help () {
 ecsh_vendor () {
 
 
-    echo "ecsh: vendor"
+    echo "ecsh: vendor2"
+
+    cd vendor
+
+    # SOEM 
+
+    git clone https://github.com/OpenEtherCATsociety/SOEM.git
+
+    cd SOEM
+
+    mkdir build 
+
+    cd build 
+
+    cmake ..
+
+    make 
+
+    cd ../../
+
+    # cJSON
+
+    if [ -d "./cJSON" ]
+    then
+        sudo rm -r ./cJSON
+    fi
+
+    git clone https://github.com/DaveGamble/cJSON.git
+
+
+
+}
+
+
+ecsh_build(){
+
+
+    echo "ecsh: build"
+
+    if [ -d "./build" ]
+    then
+        sudo rm -r ./build
+    fi
+
+    mkdir -p build
+
+    cd build
+
+    cmake ..
+
+    make
+
+
+
+
+}
+
+
+
+ecsh_vendor_rt () {
+
+
+    echo "ecsh: vendor rt"
 
     cd vendor
 
@@ -76,10 +138,12 @@ ecsh_vendor () {
 
 
 
-ecsh_build(){
 
 
-    echo "ecsh: build"
+ecsh_build_rt(){
+
+
+    echo "ecsh: build rt"
 
     if [ -d "./build" ]
     then
@@ -90,7 +154,7 @@ ecsh_build(){
 
     cd build
 
-    cmake  ..
+    cmake -DECRT=y ..
 
     make
 
@@ -129,6 +193,17 @@ then
 elif [ "$CMD" == "vendor" ]
 then
 
+
+    ecsh_vendor 
+
+elif [ "$CMD" == "build" ]
+then 
+
+    ecsh_build
+
+elif [ "$CMD" == "vendor_rt" ]
+then
+
     EC_PREBUILT=""
 
     if [ ! -z "$2" ]
@@ -136,12 +211,13 @@ then
         EC_PREBUILT="$2"
     fi
 
-    ecsh_vendor "$EC_PREBUILT"
+    ecsh_vendor_rt "$EC_PREBUILT"
 
-elif [ "$CMD" == "build" ]
+elif [ "$CMD" == "build_rt" ]
 then 
 
-    ecsh_build
+    ecsh_build_rt
+
 
 
 elif [ "$CMD" == "run" ]
