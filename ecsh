@@ -23,7 +23,7 @@ ecsh_help () {
 ecsh_vendor () {
 
 
-    echo "ecsh: vendor2"
+    echo "ecsh: vendor"
 
     cd vendor
 
