@@ -7,7 +7,7 @@ void ECAT2_shutdown()
 
 {
 
-   ECAT2_free_pdo();
+   // ECAT2_free_pdo();
 
    printf("\nRequest init state for all slaves\n");
 
@@ -398,7 +398,7 @@ void ECAT2_alloc_pdo(ec_slavet *ec_slave){
 
       memset(motor_rxpdos[i], 0 , sizeof(servo_rxpdo_t));
 
-      motor_rxpdos[i] = (servo_rxpdo_t*)ec_slave[slave_idx].inputs;
+      motor_rxpdos[i] = (servo_rxpdo_t*)ec_slave[slave_idx].outputs;
 
    }
 
@@ -412,7 +412,7 @@ void ECAT2_alloc_pdo(ec_slavet *ec_slave){
 
       memset(motor_txpdos[i], 0 , sizeof(servo_txpdo_t));
 
-      motor_txpdos[i] = (servo_txpdo_t*)ec_slave[slave_idx].outputs;
+      motor_txpdos[i] = (servo_txpdo_t*)ec_slave[slave_idx].inputs;
 
    }
 
