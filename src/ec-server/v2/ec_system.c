@@ -7,8 +7,6 @@ void ECAT2_shutdown()
 
 {
 
-   // ECAT2_free_pdo();
-
    printf("\nRequest init state for all slaves\n");
 
    ec_slave[0].state = EC_STATE_INIT;
@@ -23,6 +21,9 @@ void ECAT2_shutdown()
    /* stop SOEM, close socket */
 
    ec_close();
+
+
+   ECAT2_free_pdo();
 
 }
 
@@ -430,12 +431,6 @@ void ECAT2_free_pdo(){
          break;
       }
 
-      for (int i = 0 ; i < g_num_of_slaves; i ++){
-
-         free(motor_rxpdos[i]);
-
-      }
-
       free(motor_rxpdos);
 
    } while (0);
@@ -449,11 +444,6 @@ void ECAT2_free_pdo(){
 
       }
 
-      for(int i = 0; i < g_num_of_slaves; i ++){
-
-         free(motor_txpdos[i]);
-
-      }
 
       free(motor_txpdos);
 
