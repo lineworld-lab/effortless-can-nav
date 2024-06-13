@@ -63,7 +63,7 @@ servo_txpdo_t **motor_txpdos = NULL;
 
 pthread_t ECAT2_tid;
 
-extern char* main_if_name = "enp1s0";
+char* main_if_name = "enp4s0";
 
 int main(int argc, char *argv[])
 
