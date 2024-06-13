@@ -71,7 +71,7 @@
 #define POSITION_TO_DEGREE(POSITION) (POSITION / 400000.0 * 360.0)
 
 
-typedef struct servo_rxpdo_t
+typedef struct PACKED
 
 {
 
@@ -87,7 +87,7 @@ typedef struct servo_rxpdo_t
 
 } servo_rxpdo_t;
 
-typedef struct servo_txpdo_t
+typedef struct PACKED
 
 {
 
