@@ -634,7 +634,7 @@ void ECAT2_lifecycle(char *ifname)
    inOP = TRUE;
 
 
-   ECAT2_alloc_pdo(ec_slave);
+   ECAT2_init_pdo(ec_slave);
 
 
    pthread_create(&ECAT2_tid, NULL, ECAT2_listen_and_serve, NULL);
@@ -1029,7 +1029,7 @@ void ECAT2_lifecycle(char *ifname)
 
                motor_rxpdos[motor]->mode_of_operation = 0x01;
 
-               motor_rxpdos[motor]->profile_velocity = 100000;
+               motor_rxpdos[motor]->profile_velocity = VELOCITY_TO_START_OFFSET;
 
             }
 

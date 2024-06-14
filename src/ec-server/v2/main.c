@@ -22,13 +22,23 @@ uint8 currentgroup = 0;
 
 boolean forceByteAlignment = FALSE;
 
-int debug_mode = 0;
 
 
-// margin degrees to make homing reliable
+
+
+
+int g_num_of_slaves;
+
+
+
+char main_if_name[MAX_IFNAME] = {0};
+
+int MOVE_FAIL_THRESHOLD;
 
 int HOMING_MARGIN_DEGREES;
 
+
+int VELOCITY_TO_START_OFFSET;
 
 int WORKING_COUNTER_FAIL_THRESHOLD;
 
@@ -39,17 +49,9 @@ int ERROR_COUNT_THRESHOLD;
 
 int error_count = 0;
 
+int debug_mode = 0;
 
-int MOVE_FAIL_THRESHOLD;
-
-
-int g_num_of_slaves;
-
-
-pthread_t ECAT2_tid;
-
-char main_if_name[MAX_IFNAME] = {0};
-
+int homing_at_start = 1;
 
 // Home sensor position from front, anti-clockwise. 400000 is one rotation
 
@@ -64,6 +66,10 @@ int *arr_start_offset = NULL;
 servo_rxpdo_t **motor_rxpdos = NULL;
 
 servo_txpdo_t **motor_txpdos = NULL;
+
+
+
+pthread_t ECAT2_tid;
 
 
 int main(int argc, char *argv[])

@@ -143,7 +143,7 @@ int InitRuntimeFrom(char* filename){
     }
 
 
-    cJSON *if_name = cJSON_GetItemFromObjectCaseSensitive(conf_json, "if_name");
+    cJSON *if_name = cJSON_GetObjectItemCaseSensitive(conf_json, "if_name");
 
     if(strlen(if_name->valuestring) > MAX_IFNAME){
 
@@ -155,13 +155,28 @@ int InitRuntimeFrom(char* filename){
 
     strcpy(main_if_name, if_name->valuestring);
 
-    cJSON *move_fail_threshold = cJSON_GetItemFromObjectCaseSensitive(conf_json, "move_fail_threshold");
-
-    MOVE_FAIL_THRESHOLD = move_fail_threshold->valueint;
 
     cJSON *homing_margin_degrees = cJSON_GetObjectItemCaseSensitive(conf_json, "homing_margin_degrees");
 
     HOMING_MARGIN_DEGREES = homing_margin_degrees->valueint;
+
+    cJSON *velocity_to_start_offset = cJSON_GetObjectItemCaseSensitive(conf_json, "velocity_to_start_offset");
+
+    VELOCITY_TO_START_OFFSET = velocity_to_start_offset->valueint;
+
+    cJSON *move_fail_threshold = cJSON_GetObjectItemCaseSensitive(conf_json, "move_fail_threshold");
+
+    MOVE_FAIL_THRESHOLD = move_fail_threshold->valueint;
+
+
+    cJSON *wkc_fail_threshold = cJSON_GetObjectItemCaseSensitive(conf_json, "working_counter_fail_threshold");
+
+    WORKING_COUNTER_FAIL_THRESHOLD = wkc_fail_threshold->valueint;
+
+    cJSON *ecount_threshold = cJSON_GetObjectItemCaseSensitive(conf_json, "error_count_threshold");
+
+    ERROR_COUNT_THRESHOLD = ecount_threshold->valueint;
+
 
 
     cJSON *debug_mode_ = cJSON_GetObjectItemCaseSensitive(conf_json, "debug_mode");

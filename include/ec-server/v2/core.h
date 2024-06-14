@@ -127,34 +127,31 @@ extern uint8 currentgroup;
 
 extern boolean forceByteAlignment;
 
-extern int debug_mode;
 
-extern int homing_at_start;
-
+extern int g_num_of_slaves;
 
 
-// margin degrees to make homing reliable
+
+extern char main_if_name[MAX_IFNAME];
 
 extern int HOMING_MARGIN_DEGREES;
 
+
+extern int VELOCITY_TO_START_OFFSET;
+
+extern int MOVE_FAIL_THRESHOLD;
 
 extern int WORKING_COUNTER_FAIL_THRESHOLD ;
 
 extern int working_counter_fail_count;
 
-
 extern int ERROR_COUNT_THRESHOLD ;
 
 extern int error_count;
 
+extern int debug_mode;
 
-extern int MOVE_FAIL_THRESHOLD;
-
-
-extern int we_are_testing;
-
-extern int g_num_of_slaves;
-
+extern int homing_at_start;
 
 
 // Home sensor position from front, anti-clockwise. 400000 is one rotation
@@ -166,13 +163,10 @@ extern int *arr_home_sensor_position;
 
 extern int *arr_start_offset;
 
-extern pthread_t ECAT2_tid;
-
-extern char main_if_name[MAX_IFNAME];
-
 
 extern servo_rxpdo_t **motor_rxpdos;
 extern servo_txpdo_t **motor_txpdos;
 
+extern pthread_t ECAT2_tid;
 
 #endif

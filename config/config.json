@@ -27,10 +27,13 @@
 
     ],
     "if_name": "enx00e04c3607cc",
-    "move_fail_threshold":50,
     "homing_margin_degrees":5,
+    "velocity_to_start_offset": 100000,
+    "move_fail_threshold":50,
+    "working_counter_fail_threshold": 20,
+    "error_count_threshold": 10,
     "debug_mode": 0,
-    "homing_at_start": 0
+    "homing_at_start": 1
 
     
 }
