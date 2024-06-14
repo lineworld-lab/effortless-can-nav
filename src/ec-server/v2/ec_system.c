@@ -3,6 +3,20 @@
 #include "ec-server/v2/utils.h"
 
 
+void ECAT2_sigint_handler(int signum)
+
+{
+
+   printf("Received signal %d: %s. Exiting...\n", signum, strsignal(signum));
+
+
+   ECAT2_shutdown();
+
+   exit(signum);
+
+}
+
+
 void ECAT2_shutdown()
 
 {
@@ -27,19 +41,6 @@ void ECAT2_shutdown()
 
 }
 
-
-void sigint_handler(int signum)
-
-{
-
-   printf("Received signal %d: %s. Exiting...\n", signum, strsignal(signum));
-
-
-   ECAT2_shutdown();
-
-   exit(signum);
-
-}
 
 
 int ECAT2_init_slave(uint16 slave)
@@ -1188,7 +1189,7 @@ void ECAT2_lifecycle(char *ifname)
 }
 
 
-OSAL_THREAD_FUNC ecatcheck(void *ptr)
+OSAL_THREAD_FUNC ECAT2_check(void *ptr)
 
 {
 
