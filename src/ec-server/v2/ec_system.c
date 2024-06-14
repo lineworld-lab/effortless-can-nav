@@ -23,7 +23,7 @@ void ECAT2_shutdown()
    ec_close();
 
 
-   ECAT2_free_pdo();
+   FreeRuntime();
 
 }
 
@@ -387,9 +387,7 @@ int ECAT2_init_slave(uint16 slave)
 }
 
 
-void ECAT2_alloc_pdo(ec_slavet *ec_slave){
-
-   motor_rxpdos = (servo_rxpdo_t **)malloc(g_num_of_slaves * sizeof(servo_rxpdo_t*));
+void ECAT2_init_pdo(ec_slavet *ec_slave){
 
    for (int i = 0 ; i < g_num_of_slaves; i++){
 
@@ -402,8 +400,6 @@ void ECAT2_alloc_pdo(ec_slavet *ec_slave){
       motor_rxpdos[i] = (servo_rxpdo_t*)ec_slave[slave_idx].outputs;
 
    }
-
-   motor_txpdos = (servo_txpdo_t **)malloc(g_num_of_slaves * sizeof(servo_txpdo_t*));
 
    for (int i = 0 ; i < g_num_of_slaves; i++){
 
@@ -421,36 +417,6 @@ void ECAT2_alloc_pdo(ec_slavet *ec_slave){
 }
 
 
-void ECAT2_free_pdo(){
-
-
-   do {
-
-      if(motor_rxpdos == NULL) {
-
-         break;
-      }
-
-      free(motor_rxpdos);
-
-   } while (0);
-
-
-   do {
-
-      if(motor_txpdos == NULL){
-
-         break;
-
-      }
-
-
-      free(motor_txpdos);
-
-   } while(0);
-
-
-}
 
 void ECAT2_lifecycle(char *ifname)
 
