@@ -22,48 +22,55 @@ uint8 currentgroup = 0;
 
 boolean forceByteAlignment = FALSE;
 
-int debug_mode = 0;
 
 
 
 
-// Home sensor position from front, anti-clockwise. 400000 is one rotation
 
-int arr_home_sensor_position[] = {332000, 300000, 393000, 139000};
-
-
-// Homing start offset
-
-int arr_start_offset[] = {0, 0, 0, 0};
+int g_num_of_slaves;
 
 
-// margin degrees to make homing reliable
 
-int HOMING_MARGIN_DEGREES = 5;
+char main_if_name[MAX_IFNAME] = {0};
+
+int MOVE_FAIL_THRESHOLD;
+
+int HOMING_MARGIN_DEGREES;
 
 
-int WORKING_COUNTER_FAIL_THRESHOLD = 20;
+int VELOCITY_TO_START_OFFSET;
+
+int WORKING_COUNTER_FAIL_THRESHOLD;
 
 int working_counter_fail_count = 0;
 
 
-int ERROR_COUNT_THRESHOLD = 10;
+int ERROR_COUNT_THRESHOLD;
 
 int error_count = 0;
 
+int debug_mode = 0;
 
-int MOVE_FAIL_THRESHOLD = 50;
+int homing_at_start = 1;
+
+// Home sensor position from front, anti-clockwise. 400000 is one rotation
+
+int *arr_home_sensor_position = NULL;
 
 
-int g_num_of_slaves = 4;
+// Homing start offset
+
+int *arr_start_offset = NULL;
+
 
 servo_rxpdo_t **motor_rxpdos = NULL;
 
 servo_txpdo_t **motor_txpdos = NULL;
 
+
+
 pthread_t ECAT2_tid;
 
-char* main_if_name = "enx00e04c3607cc";
 
 int main(int argc, char *argv[])
 
@@ -72,43 +79,23 @@ int main(int argc, char *argv[])
    printf("SOEM (Simple Open EtherCAT Master)\nServo controller\n");
 
 
-   signal(SIGINT, sigint_handler);
 
 
-   for (int i = 1; i < argc; i++)
-
-   {
-
-      if (strcmp(argv[i], "--log-level") == 0)
-
-      {
-
-         printf("Log level: %s\n", argv[i + 1]);
+   int config_result = InitRuntimeFrom("config.json");
 
 
-         if (strcmp(argv[i + 1], "debug") == 0)
+   if (config_result < 0){
 
-         {
 
-            debug_mode = 1;
+      printf("failed to init with config json\n");
 
-            printf("Debug mode enabled\n");
-
-         }
-
-         else
-
-         {
-
-            debug_mode = 0;
-
-            printf("Debug mode disabled\n");
-
-         }
-
-      }
+      return config_result;
 
    }
+
+
+   signal(SIGINT, sigint_handler);
+
 
 
    if (argc > 1)

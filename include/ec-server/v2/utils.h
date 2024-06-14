@@ -5,7 +5,11 @@
 
 #include "cJSON.h"
 
-int InitRuntimeFromConfigJSON();
+int InitRuntimeFrom(char* filename);
 
+
+int AllocRuntime();
+
+void FreeRuntime();
 
 #endif

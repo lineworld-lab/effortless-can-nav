@@ -12,9 +12,7 @@ void sigint_handler(int signum);
 
 int ECAT2_init_slave(uint16 slave);
 
-void ECAT2_alloc_pdo(ec_slavet *ec_slave);
-
-void ECAT2_free_pdo();
+void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
 

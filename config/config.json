@@ -6,24 +6,34 @@
 
         {
             "id": 0,
-            "homing_offset": 65000
+            "homing_offset": 332000,
+            "start_offset":0
         },
         {
             "id": 1,
-            "homing_offset": 300000
+            "homing_offset": 300000,
+            "start_offset":0
         },
         {
             "id": 2,
-            "homing_offset": 392520
+            "homing_offset": 393000,
+            "start_offset":0
         },
         {
             "id": 3,
-            "homing_offset": 255000
+            "homing_offset": 139000,
+            "start_offset":0
         }
 
     ],
-    "test": 0,
-    "homing_at_start": 0
+    "if_name": "enx00e04c3607cc",
+    "homing_margin_degrees":5,
+    "velocity_to_start_offset": 100000,
+    "move_fail_threshold":50,
+    "working_counter_fail_threshold": 20,
+    "error_count_threshold": 10,
+    "debug_mode": 0,
+    "homing_at_start": 1
 
     
 }
