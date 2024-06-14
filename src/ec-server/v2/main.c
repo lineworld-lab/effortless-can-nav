@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
    }
 
 
-   signal(SIGINT, sigint_handler);
+   signal(SIGINT, ECAT2_sigint_handler);
 
 
 
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 
    {
 
-      osal_thread_create(&thread1, 128000, &ecatcheck, NULL);
+      osal_thread_create(&thread1, 128000, &ECAT2_check, NULL);
 
       /* start cyclic part */
 

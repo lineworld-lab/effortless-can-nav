@@ -5,10 +5,9 @@
 #include "ec-server/v2/core.h"
 
 
+void ECAT2_sigint_handler(int signum);
 
 void ECAT2_shutdown();
-
-void sigint_handler(int signum);
 
 int ECAT2_init_slave(uint16 slave);
 
@@ -16,11 +15,7 @@ void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
 
-
-
-
-
-OSAL_THREAD_FUNC ecatcheck(void *ptr);
+OSAL_THREAD_FUNC ECAT2_check(void *ptr);
 
 
 int read_sdo_u8(uint16 slave, uint16 index, uint8 subindex, uint8 *read_data);
