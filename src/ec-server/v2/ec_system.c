@@ -658,93 +658,101 @@ void ECAT2_lifecycle(char *ifname)
    while (1)
    {
 
-      control_stat = ECAT2_exchange();
+      for(int motor = 0; motor < ec_slavecount; motor++){
 
-      if(control_stat < 0){
 
-         break;
+         control_stat = ECAT2_exchange(motor);
 
-      } else if (control_stat == 0){
+         if(control_stat < 0){
 
-         continue;
+            break;
+
+         } else if (control_stat == 0){
+
+            continue;
+
+         }
+
+         control_stat = ECAT2_sync_status(motor);
+
+         if(control_stat < 0){
+
+            break;
+
+         } else if (control_stat == 0){
+
+            continue;
+
+         }    
+
+
+         if (_PHASE_ == ECAT2_HOMING){
+
+            control_stat = ECAT2_homing(motor);
+
+            if(control_stat < 0){
+
+               break;
+
+            } else if (control_stat == 0){
+
+               continue;
+
+            }
+
+
+         } else if (_PHASE_ == ECAT2_MOVING){
+
+            control_stat = ECAT2_moving(motor);
+
+            if(control_stat < 0){
+
+               break;
+
+            } else if (control_stat == 0){
+
+               continue;
+
+            }
+
+         }
+
 
       }
 
-      control_stat = ECAT2_sync_status();
-
       if(control_stat < 0){
 
-         break;
+         inOP = FALSE;
 
-      } else if (control_stat == 0){
+         ECAT2_shutdown();
 
-         continue;
-
-      }    
-
-
-      if (_PHASE_ == ECAT2_HOMING){
-
-         control_stat = ECAT2_homing();
-
-         if(control_stat < 0){
-
-            break;
-
-         } else if (control_stat == 0){
-
-            continue;
-
-         }
-
-
-      } else if (_PHASE_ == ECAT2_MOVING){
-
-         control_stat = ECAT2_moving();
-
-         if(control_stat < 0){
-
-            break;
-
-         } else if (control_stat == 0){
-
-            continue;
-
-         }
+         return;
 
       }
 
 
    }
 
-
-   inOP = FALSE;
-
-   ECAT2_shutdown();
 
 }
 
 
-int ECAT2_exchange(){
+int ECAT2_exchange(int motor){
 
 
-   for (int motor = 0; motor < ec_slavecount; motor++)
+  
 
-   {
+   printf_debug("\033[38;5;208m[DEBUG] Motor:%d, Control Word:0x%x, Target Position:%d, Profile Velocity:%d, Mode of Operation:0x%x\033[0m\n",
 
-      printf_debug("\033[38;5;208m[DEBUG] Motor:%d, Control Word:0x%x, Target Position:%d, Profile Velocity:%d, Mode of Operation:0x%x\033[0m\n",
+                  motor,
 
-                     motor,
+                  motor_rxpdos[motor]->control_word,
 
-                     motor_rxpdos[motor]->control_word,
+                  motor_rxpdos[motor]->target_position,
 
-                     motor_rxpdos[motor]->target_position,
+                  motor_rxpdos[motor]->profile_velocity,
 
-                     motor_rxpdos[motor]->profile_velocity,
-
-                     motor_rxpdos[motor]->mode_of_operation);
-
-   }
+                  motor_rxpdos[motor]->mode_of_operation);
 
 
    osal_usleep(50000);
@@ -795,456 +803,176 @@ int ECAT2_exchange(){
 }
 
 
-int ECAT2_sync_status(){
+int ECAT2_sync_status(int motor){
 
-   for(int motor = 0; motor < ec_slavecount; motor++){
 
-      if (motor_txpdos[motor]->error_code != 0)
+
+   if (motor_txpdos[motor]->error_code != 0)
+
+   {
+
+      printf("\033[1;31m[ERROR] Motor:%d, Error Code:0x%x\033[0m\n", motor, motor_txpdos[motor]->error_code);
+
+
+      if (motor_txpdos[motor]->error_code != 0x7500)
 
       {
 
-         printf("\033[1;31m[ERROR] Motor:%d, Error Code:0x%x\033[0m\n", motor, motor_txpdos[motor]->error_code);
-
-
-         if (motor_txpdos[motor]->error_code != 0x7500)
-
-         {
-
-            error_count++;
-
-         }
-
-
-         if (error_count >= ERROR_COUNT_THRESHOLD)
-
-         {
-
-            printf("\033[1;31m[ERROR] Error count exceeds threshold. Exiting...\033[0m\n");
-
-            return -1;
-
-         }
+         error_count++;
 
       }
 
 
-      printf_debug("[DEBUG] Motor:%d, Status Word:0x%x, Actual Pos:%d, Actual Vel:%d, Home sensor:0x%x, Err Code:0x%x, Mode of OP Disp:0x%x\n",
-
-                     motor,
-
-                     motor_txpdos[motor]->status_word,
-
-                     motor_txpdos[motor]->position_actual_value,
-
-                     motor_txpdos[motor]->velocity_actual_value,
-
-                     motor_txpdos[motor]->digital_inputs,
-
-                     motor_txpdos[motor]->error_code,
-
-                     motor_txpdos[motor]->mode_of_operation_display);
-
-
-      // trim status word to 7 bits
-
-      int sw = motor_txpdos[motor]->status_word;
-
-      int base = motor_txpdos[motor]->status_word & 0x000F;
-
-
-      /* xxxx xxxx x011 0111b OPERATION_ENABLED */
-
-      if ((base | (sw & (7 << 4))) != STATUS_WORD_OPERATION_ENABLED)
+      if (error_count >= ERROR_COUNT_THRESHOLD)
 
       {
 
-         /* xxxx xxxx x0xx 0000 STATUS_WORD_NOT_READY_TO_SWITCH_ON */
+         printf("\033[1;31m[ERROR] Error count exceeds threshold. Exiting...\033[0m\n");
 
-         if (base == STATUS_WORD_NOT_READY_TO_SWITCH_ON)
-
-         {
-
-            /* Now the FSM should authomatically go to the SWITCH_ON_DISABLED state */
-
-            printf("[INFO] Motor:%d, Not ready to switch on\n", motor);
-
-            continue;
-
-         }
-
-         /* xxxx xxxx x1xx 0000 STATUS_WORD_SWITCH_ON_DISABLED */
-
-         else if ((base | (sw & (1 << 6))) == STATUS_WORD_SWITCH_ON_DISABLED)
-
-         {
-
-            printf("[INFO] Motor:%d, Switch on disabled\n", motor);
-
-
-            /* Automatic translation (2) */
-
-            motor_rxpdos[motor]->control_word = 0x6;
-
-
-            continue;
-
-         }
-
-         /* xxxx xxxx x01x 0001 STATUS_WORD_READY_TO_SWITCH_ON */
-
-         else if ((base | (sw & (3 << 5))) == STATUS_WORD_READY_TO_SWITCH_ON)
-
-         {
-
-            printf("[INFO] Motor:%d, Ready to switch on\n", motor);
-
-
-            /* transition 3 */
-
-            motor_rxpdos[motor]->control_word = 0xf;
-
-
-            continue;
-
-         }
-
-         /*xxxx xxxx x011 0011 STATUS_WORD_SWITCHED_ON*/
-
-         else if ((base | (sw & (7 << 4))) == STATUS_WORD_SWITCHED_ON)
-
-         {
-
-            printf("[INFO] Motor:%d, Switched on\n", motor);
-
-
-            /* Enable operation command for transition (4) */
-
-            motor_rxpdos[motor]->control_word = 0xf;
-
-
-            continue;
-
-         }
-
-         /* xxxx xxxx x00x 0111 STATUS_WORD_QUICK_STOP_ACTIVE */
-
-         else if ((base | (sw & (3 << 5))) == STATUS_WORD_QUICK_STOP_ACTIVE)
-
-         {
-
-            printf("[INFO] Motor:%d, Quick stop active\n", motor);
-
-            continue;
-
-         }
-
-         /* xxxx xxxx x0xx 1111 STATUS_WORD_FAULT_REACTION_ACTIVE */
-
-         else if ((base | (sw & (1 << 6))) == STATUS_WORD_FAULT_REACTION_ACTIVE)
-
-         {
-
-            printf("[INFO] Motor:%d, Fault reaction active\n", motor);
-
-            continue;
-
-         }
-
-         /* xxxx xxxx x0xx 1000 STATUS_WORD_FAULT */
-
-         else if ((base | (sw & (1 << 6))) == STATUS_WORD_FAULT)
-
-         {
-
-            printf("[WARNING] Motor:%d, Fault detected\n", motor);
-
-
-            /* Returning to Switch On Disabled (transition 15) */
-
-            motor_rxpdos[motor]->control_word = (1 << BIT_CONTROL_WORD_FAULTRESET);
-
-
-            continue;
-
-         }
-
-         else
-
-         {
-
-            printf("[ERROR] Motor:%d, Unknown status word:0x%x\n", motor, motor_txpdos[motor]->status_word);
-
-            return -1;
-
-         }
+         return -1;
 
       }
-
-
-      if (motor_txpdos[motor]->mode_of_operation_display == MODE_PP && TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_PP_SETPOINT_ACKNOWLEDGE))
-
-      {
-
-         // reset new_set_point to 0 in profile position mode
-
-         motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_NEW_SET;
-
-         motor_rxpdos[motor]->mode_of_operation = MODE_PP;
-
-         continue;
-
-      }
-
-
-
-   }
-
-   return 1;
-
-
-}
-
-
-int ECAT2_homing(){
-
-
-   for(int motor = 0; motor < ec_slavecount; motor++){
-
-
-      if (!has_moved_to_start_offset){
-
-         int is_start_offset_complete = 1;
-
-         for(int i = 0; i < g_num_of_slaves; i ++){
-
-            if(!arr_has_moved_to_start_offset[i]){
-
-               is_start_offset_complete = 0;
-
-               break;
-
-            }
-
-         }
-
-         if(is_start_offset_complete){
-
-            has_moved_to_start_offset = 1;
-
-         }
-
-      } 
-
-      if (_PHASE_ == ECAT2_HOMING)
-      {
-
-         int is_homing_complete = 1;
-
-         for(int i = 0; i < g_num_of_slaves; i ++){
-
-            if(!arr_is_homing_done[i]){
-
-               is_homing_complete = 0;
-
-               break;
-
-            }
-
-         }
-
-         if(is_homing_complete){
-
-            _PHASE_ = ECAT2_MOVING;
-
-            printf("[INFO] All motors have completed homing\n");
-
-
-            // set software limit to -200000 and 200000 by sdo
-
-            if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x01, -200000) == 0)
-
-            {
-
-               printf("\033[1;31m[ERROR] Failed to set position min. limit for motor %d\033[0m\n", motor);
-
-               return -1;
-
-            }
-
-            if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x02, 200000) == 0)
-
-            {
-
-               printf("\033[1;31m[ERROR] Failed to set position max. limit for motor %d\033[0m\n", motor);
-
-               return -1;
-
-            }
-
-         } 
-      }
-
-
-      if (!arr_has_moved_to_start_offset[motor])
-
-      {
-
-         // The motors need to move in the negative direction for the calculated
-
-         // distance to ensure that the home sensor is located on the negative side
-
-         // relative to the front of the wheel.
-
-         motor_rxpdos[motor]->target_position = arr_initial_positions[motor] + arr_start_offset[motor];
-
-
-         if (motor_txpdos[motor]->position_actual_value == motor_rxpdos[motor]->target_position)
-
-         {
-
-            printf("[INFO] Motor %d has reached start offset\n", motor);
-
-            arr_has_moved_to_start_offset[motor] = 1;
-
-         }
-
-         else
-
-         {
-
-            motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
-            motor_rxpdos[motor]->mode_of_operation = MODE_PP;
-
-            motor_rxpdos[motor]->profile_velocity = VELOCITY_TO_START_OFFSET;
-
-         }
-
-      } else if (arr_has_moved_to_start_offset[motor] && !arr_is_homing_done[motor]){
-
-         /* Homming */
-
-         int homing_error = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_HOMING_ERROR);
-
-         int homing_attained = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_HOMING_ATTAINED);
-
-         int target_reached = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_TARGET_REACHED);
-
-
-         if (!target_reached)
-
-         {
-
-            printf_debug("[DEBUG] Motor:%d, Homing is ongoing\n", motor);
-
-            continue;
-
-         }
-
-         else if (homing_error)
-
-         {
-
-            printf("\033[1;31m[ERROR] Motor %d has failed to reach home position\033[0m\n", motor);
-
-            return -1;
-
-         }
-
-         else if (!homing_attained)
-
-         {
-
-            printf("[INFO] Motor:%d, Start homing. status word:0x%x, homing error:%d, homing attained:%d\n", motor, motor_txpdos[motor]->status_word, homing_error, homing_attained);
-
-            motor_rxpdos[motor]->mode_of_operation = MODE_HM;
-
-            motor_rxpdos[motor]->control_word = CONTROL_WORD_HM_OP_START;
-
-         }
-
-         else if (homing_attained)
-
-         {
-
-            printf("[INFO] Motor %d has reached home position\n", motor);
-
-            arr_is_homing_done[motor] = 1;
-
-            motor_rxpdos[motor]->target_position = 0;
-
-            motor_rxpdos[motor]->profile_velocity = 50000;
-
-         }
-
-      }
-
 
    }
 
 
-   return 1;
+   printf_debug("[DEBUG] Motor:%d, Status Word:0x%x, Actual Pos:%d, Actual Vel:%d, Home sensor:0x%x, Err Code:0x%x, Mode of OP Disp:0x%x\n",
 
-}
+                  motor,
 
-int ECAT2_moving(){
+                  motor_txpdos[motor]->status_word,
 
-   for(int motor = 0 ; motor < ec_slavecount; motor++){
+                  motor_txpdos[motor]->position_actual_value,
 
-      motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
-      motor_rxpdos[motor]->mode_of_operation = MODE_PP;
+                  motor_txpdos[motor]->velocity_actual_value,
 
-      motor_rxpdos[motor]->profile_velocity = 1500000;
+                  motor_txpdos[motor]->digital_inputs,
+
+                  motor_txpdos[motor]->error_code,
+
+                  motor_txpdos[motor]->mode_of_operation_display);
 
 
-      if (motor_txpdos[motor]->position_actual_value != motor_rxpdos[motor]->target_position && motor_txpdos[motor]->velocity_actual_value == 0)
+   // trim status word to 7 bits
+
+   int sw = motor_txpdos[motor]->status_word;
+
+   int base = motor_txpdos[motor]->status_word & 0x000F;
+
+
+   /* xxxx xxxx x011 0111b OPERATION_ENABLED */
+
+   if ((base | (sw & (7 << 4))) != STATUS_WORD_OPERATION_ENABLED)
+
+   {
+
+      /* xxxx xxxx x0xx 0000 STATUS_WORD_NOT_READY_TO_SWITCH_ON */
+
+      if (base == STATUS_WORD_NOT_READY_TO_SWITCH_ON)
 
       {
 
-         arr_move_fail_count[motor]++;
+         /* Now the FSM should authomatically go to the SWITCH_ON_DISABLED state */
 
-         if (arr_move_fail_count[motor] >= MOVE_FAIL_THRESHOLD)
+         printf("[INFO] Motor:%d, Not ready to switch on\n", motor);
 
-         {
+         return 0;
 
-            printf("\033[1;31m[WARN] Motor %d seems not to follow the target position.\033[0m\n", motor);
+      }
 
-            printf("[WARN] Motor:%d, Status Word:0x%x, Actual Pos:%d, Actual Vel:%d, Home sensor:0x%x, Err Code:0x%x, Mode of OP Disp:0x%x\n",
+      /* xxxx xxxx x1xx 0000 STATUS_WORD_SWITCH_ON_DISABLED */
 
-                     motor,
+      else if ((base | (sw & (1 << 6))) == STATUS_WORD_SWITCH_ON_DISABLED)
 
-                     motor_txpdos[motor]->status_word,
+      {
 
-                     motor_txpdos[motor]->position_actual_value,
+         printf("[INFO] Motor:%d, Switch on disabled\n", motor);
 
-                     motor_txpdos[motor]->velocity_actual_value,
 
-                     motor_txpdos[motor]->digital_inputs,
+         /* Automatic translation (2) */
 
-                     motor_txpdos[motor]->error_code,
+         motor_rxpdos[motor]->control_word = 0x6;
 
-                     motor_txpdos[motor]->mode_of_operation_display);
 
-            printf("\033[38;5;208m[WARN] Motor:%d, Control Word:0x%x, Target Position:%d, Profile Velocity:%d, Mode of Operation:0x%x\033[0m\n",
+         return 0;
 
-                           motor,
+      }
 
-                           motor_rxpdos[motor]->control_word,
+      /* xxxx xxxx x01x 0001 STATUS_WORD_READY_TO_SWITCH_ON */
 
-                           motor_rxpdos[motor]->target_position,
+      else if ((base | (sw & (3 << 5))) == STATUS_WORD_READY_TO_SWITCH_ON)
 
-                           motor_rxpdos[motor]->profile_velocity,
+      {
 
-                           motor_rxpdos[motor]->mode_of_operation);
+         printf("[INFO] Motor:%d, Ready to switch on\n", motor);
 
-            // print OD_VELOCITY_DEMAND_VALUE
 
-            int32 velocity_demand_value = 0;
+         /* transition 3 */
 
-            read_sdo_s32(motor + 1, OD_VELOCITY_DEMAND_VALUE, 0x00, &velocity_demand_value);
+         motor_rxpdos[motor]->control_word = 0xf;
 
-            printf("[WARN] Motor:%d, Velocity Demand Value: %d\n", motor, velocity_demand_value);
 
-         }
+         return 0;
+
+      }
+
+      /*xxxx xxxx x011 0011 STATUS_WORD_SWITCHED_ON*/
+
+      else if ((base | (sw & (7 << 4))) == STATUS_WORD_SWITCHED_ON)
+
+      {
+
+         printf("[INFO] Motor:%d, Switched on\n", motor);
+
+
+         /* Enable operation command for transition (4) */
+
+         motor_rxpdos[motor]->control_word = 0xf;
+
+
+         return 0;
+
+      }
+
+      /* xxxx xxxx x00x 0111 STATUS_WORD_QUICK_STOP_ACTIVE */
+
+      else if ((base | (sw & (3 << 5))) == STATUS_WORD_QUICK_STOP_ACTIVE)
+
+      {
+
+         printf("[INFO] Motor:%d, Quick stop active\n", motor);
+
+         return 0;
+
+      }
+
+      /* xxxx xxxx x0xx 1111 STATUS_WORD_FAULT_REACTION_ACTIVE */
+
+      else if ((base | (sw & (1 << 6))) == STATUS_WORD_FAULT_REACTION_ACTIVE)
+
+      {
+
+         printf("[INFO] Motor:%d, Fault reaction active\n", motor);
+
+         return 0;
+
+      }
+
+      /* xxxx xxxx x0xx 1000 STATUS_WORD_FAULT */
+
+      else if ((base | (sw & (1 << 6))) == STATUS_WORD_FAULT)
+
+      {
+
+         printf("[WARNING] Motor:%d, Fault detected\n", motor);
+
+
+         /* Returning to Switch On Disabled (transition 15) */
+
+         motor_rxpdos[motor]->control_word = (1 << BIT_CONTROL_WORD_FAULTRESET);
+
+
+         return 0;
 
       }
 
@@ -1252,12 +980,281 @@ int ECAT2_moving(){
 
       {
 
-         arr_move_fail_count[motor] = 0;
+         printf("[ERROR] Motor:%d, Unknown status word:0x%x\n", motor, motor_txpdos[motor]->status_word);
+
+         return -1;
 
       }
 
+   }
+
+
+   if (motor_txpdos[motor]->mode_of_operation_display == MODE_PP && TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_PP_SETPOINT_ACKNOWLEDGE))
+
+   {
+
+      // reset new_set_point to 0 in profile position mode
+
+      motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_NEW_SET;
+
+      motor_rxpdos[motor]->mode_of_operation = MODE_PP;
+
+      return 0;
 
    }
+
+
+   return 1;
+
+
+}
+
+
+int ECAT2_homing(int motor){
+
+
+   if (!has_moved_to_start_offset){
+
+      int is_start_offset_complete = 1;
+
+      for(int i = 0; i < g_num_of_slaves; i ++){
+
+         if(!arr_has_moved_to_start_offset[i]){
+
+            is_start_offset_complete = 0;
+
+            break;
+
+         }
+
+      }
+
+      if(is_start_offset_complete){
+
+         has_moved_to_start_offset = 1;
+
+      }
+
+   } 
+
+   if (_PHASE_ == ECAT2_HOMING)
+   {
+
+      int is_homing_complete = 1;
+
+      for(int i = 0; i < g_num_of_slaves; i ++){
+
+         if(!arr_is_homing_done[i]){
+
+            is_homing_complete = 0;
+
+            break;
+
+         }
+
+      }
+
+      if(is_homing_complete){
+
+         _PHASE_ = ECAT2_MOVING;
+
+         printf("[INFO] All motors have completed homing\n");
+
+
+         // set software limit to -200000 and 200000 by sdo
+
+         if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x01, -200000) == 0)
+
+         {
+
+            printf("\033[1;31m[ERROR] Failed to set position min. limit for motor %d\033[0m\n", motor);
+
+            return -1;
+
+         }
+
+         if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x02, 200000) == 0)
+
+         {
+
+            printf("\033[1;31m[ERROR] Failed to set position max. limit for motor %d\033[0m\n", motor);
+
+            return -1;
+
+         }
+
+      } 
+   }
+
+
+   if (!arr_has_moved_to_start_offset[motor])
+
+   {
+
+      // The motors need to move in the negative direction for the calculated
+
+      // distance to ensure that the home sensor is located on the negative side
+
+      // relative to the front of the wheel.
+
+      motor_rxpdos[motor]->target_position = arr_initial_positions[motor] + arr_start_offset[motor];
+
+
+      if (motor_txpdos[motor]->position_actual_value == motor_rxpdos[motor]->target_position)
+
+      {
+
+         printf("[INFO] Motor %d has reached start offset\n", motor);
+
+         arr_has_moved_to_start_offset[motor] = 1;
+
+      }
+
+      else
+
+      {
+
+         motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
+         motor_rxpdos[motor]->mode_of_operation = MODE_PP;
+
+         motor_rxpdos[motor]->profile_velocity = VELOCITY_TO_START_OFFSET;
+
+      }
+
+   } else if (arr_has_moved_to_start_offset[motor] && !arr_is_homing_done[motor]){
+
+      /* Homming */
+
+      int homing_error = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_HOMING_ERROR);
+
+      int homing_attained = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_HOMING_ATTAINED);
+
+      int target_reached = TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_HM_TARGET_REACHED);
+
+
+      if (!target_reached)
+
+      {
+
+         printf_debug("[DEBUG] Motor:%d, Homing is ongoing\n", motor);
+
+         return 0;
+
+      }
+
+      else if (homing_error)
+
+      {
+
+         printf("\033[1;31m[ERROR] Motor %d has failed to reach home position\033[0m\n", motor);
+
+         return -1;
+
+      }
+
+      else if (!homing_attained)
+
+      {
+
+         printf("[INFO] Motor:%d, Start homing. status word:0x%x, homing error:%d, homing attained:%d\n", motor, motor_txpdos[motor]->status_word, homing_error, homing_attained);
+
+         motor_rxpdos[motor]->mode_of_operation = MODE_HM;
+
+         motor_rxpdos[motor]->control_word = CONTROL_WORD_HM_OP_START;
+
+      }
+
+      else if (homing_attained)
+
+      {
+
+         printf("[INFO] Motor %d has reached home position\n", motor);
+
+         arr_is_homing_done[motor] = 1;
+
+         motor_rxpdos[motor]->target_position = 0;
+
+         motor_rxpdos[motor]->profile_velocity = 50000;
+
+      }
+
+   }
+
+   return 1;
+
+}
+
+int ECAT2_moving(int motor){
+
+
+   motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
+   motor_rxpdos[motor]->mode_of_operation = MODE_PP;
+
+   motor_rxpdos[motor]->profile_velocity = 1500000;
+
+
+   if (motor_txpdos[motor]->position_actual_value != motor_rxpdos[motor]->target_position && motor_txpdos[motor]->velocity_actual_value == 0)
+
+   {
+
+      arr_move_fail_count[motor]++;
+
+      if (arr_move_fail_count[motor] >= MOVE_FAIL_THRESHOLD)
+
+      {
+
+         printf("\033[1;31m[WARN] Motor %d seems not to follow the target position.\033[0m\n", motor);
+
+         printf("[WARN] Motor:%d, Status Word:0x%x, Actual Pos:%d, Actual Vel:%d, Home sensor:0x%x, Err Code:0x%x, Mode of OP Disp:0x%x\n",
+
+                  motor,
+
+                  motor_txpdos[motor]->status_word,
+
+                  motor_txpdos[motor]->position_actual_value,
+
+                  motor_txpdos[motor]->velocity_actual_value,
+
+                  motor_txpdos[motor]->digital_inputs,
+
+                  motor_txpdos[motor]->error_code,
+
+                  motor_txpdos[motor]->mode_of_operation_display);
+
+         printf("\033[38;5;208m[WARN] Motor:%d, Control Word:0x%x, Target Position:%d, Profile Velocity:%d, Mode of Operation:0x%x\033[0m\n",
+
+                        motor,
+
+                        motor_rxpdos[motor]->control_word,
+
+                        motor_rxpdos[motor]->target_position,
+
+                        motor_rxpdos[motor]->profile_velocity,
+
+                        motor_rxpdos[motor]->mode_of_operation);
+
+         // print OD_VELOCITY_DEMAND_VALUE
+
+         int32 velocity_demand_value = 0;
+
+         read_sdo_s32(motor + 1, OD_VELOCITY_DEMAND_VALUE, 0x00, &velocity_demand_value);
+
+         printf("[WARN] Motor:%d, Velocity Demand Value: %d\n", motor, velocity_demand_value);
+
+      }
+
+   }
+
+   else
+
+   {
+
+      arr_move_fail_count[motor] = 0;
+
+   }
+
+
+
 
    return 1;
 
