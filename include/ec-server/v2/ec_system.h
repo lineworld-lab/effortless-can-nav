@@ -16,6 +16,8 @@ void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
 
+int ECAT2_exchange();
+
 void ECAT2_homing();
 
 void ECAT2_moving();

@@ -652,11 +652,25 @@ void ECAT2_lifecycle(char *ifname)
    }
 
 
-   /* cyclic loop */
+   int exchange_stat = 0;
+
+   /* exchange loop */
 
    while (1)
 
    {
+
+      exchange_stat = ECAT2_exchange();
+
+      if(exchange_stat < 0){
+
+         return;
+
+      } else if (exchange_stat == 0){
+
+         continue;
+
+      }
 
       if (_PHASE_ == ECAT2_HOMING){
 
@@ -680,7 +694,8 @@ void ECAT2_lifecycle(char *ifname)
 }
 
 
-void ECAT2_homing(){
+int ECAT2_exchange(){
+
 
    for (int motor = 0; motor < ec_slavecount; motor++)
 
@@ -716,7 +731,7 @@ void ECAT2_homing(){
 
       ECAT2_shutdown();
 
-      return;
+      return -1;
 
    }
 
@@ -728,7 +743,7 @@ void ECAT2_homing(){
 
       working_counter_fail_count++;
 
-      return;
+      return 0;
 
    }
 
@@ -741,12 +756,19 @@ void ECAT2_homing(){
 
       ECAT2_shutdown();
 
-      return;
+      return -1;
 
    }
 
 
    working_counter_fail_count = 0;
+
+
+   return 1;
+}
+
+
+void ECAT2_homing(){
 
 
 
@@ -944,7 +966,7 @@ void ECAT2_homing(){
 
          // reset new_set_point to 0 in profile position mode
 
-         motor_rxpdos[motor]->control_word = 0x002F;
+         motor_rxpdos[motor]->control_word = CONTROL_WORD_NEW_SET_POINT;
 
          motor_rxpdos[motor]->mode_of_operation = 0x01;
 
@@ -1058,8 +1080,7 @@ void ECAT2_homing(){
 
          {
 
-            motor_rxpdos[motor]->control_word = 0x003F;
-
+            motor_rxpdos[motor]->control_word = CONTROL_WORD_CHANGE_SET_IMMEDIATELY;
             motor_rxpdos[motor]->mode_of_operation = 0x01;
 
             motor_rxpdos[motor]->profile_velocity = VELOCITY_TO_START_OFFSET;
@@ -1139,8 +1160,7 @@ void ECAT2_moving(){
 
    for(int motor = 0 ; motor < ec_slavecount; motor++){
 
-      motor_rxpdos[motor]->control_word = 0x003F;
-
+      motor_rxpdos[motor]->control_word = CONTROL_WORD_CHANGE_SET_IMMEDIATELY;
       motor_rxpdos[motor]->mode_of_operation = 0x01;
 
       motor_rxpdos[motor]->profile_velocity = 1500000;
