@@ -167,6 +167,33 @@ extern int *arr_start_offset;
 extern servo_rxpdo_t **motor_rxpdos;
 extern servo_txpdo_t **motor_txpdos;
 
+
+
+
+typedef enum ECAT2_PHASE {
+
+    ECAT2_HOMING,
+    ECAT2_MOVING
+
+} ECAT2_PHASE;
+
+
+extern ECAT2_PHASE _PHASE_;
+
+extern int *arr_initial_positions;
+
+extern int *arr_has_moved_to_start_offset;
+
+extern int has_moved_to_start_offset;
+
+extern int *arr_is_homing_done;
+
+extern int *arr_move_fail_count;
+
+
 extern pthread_t ECAT2_tid;
+
+
+
 
 #endif
