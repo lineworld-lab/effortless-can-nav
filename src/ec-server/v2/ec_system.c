@@ -658,16 +658,16 @@ void ECAT2_lifecycle(char *ifname)
 
    {
 
-         if (_PHASE_ == ECAT2_HOMING){
+      if (_PHASE_ == ECAT2_HOMING){
 
-            ECAT2_homing();
+         ECAT2_homing();
 
 
-         } else if (_PHASE_ == ECAT2_MOVING){
+      } else if (_PHASE_ == ECAT2_MOVING){
 
-            ECAT2_moving();
+         ECAT2_moving();
 
-         }
+      }
 
 
    }
