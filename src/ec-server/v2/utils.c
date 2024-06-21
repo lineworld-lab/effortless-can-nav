@@ -241,6 +241,8 @@ int AllocRuntime(){
 
     memset(arr_move_fail_count, 0 , g_num_of_slaves * sizeof(int));
 
+    return 0;
+
 }
 
 
