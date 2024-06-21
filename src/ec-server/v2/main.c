@@ -84,6 +84,7 @@ int *arr_move_fail_count = NULL;
 
 pthread_t ECAT2_tid;
 
+int phase_toggle = 0;
 
 int main(int argc, char *argv[])
 

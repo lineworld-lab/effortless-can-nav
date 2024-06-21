@@ -194,6 +194,8 @@ extern int *arr_is_homing_done;
 
 extern int *arr_move_fail_count;
 
+extern int phase_toggle;
+
 
 extern pthread_t ECAT2_tid;
 

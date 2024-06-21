@@ -1,6 +1,7 @@
 #include "ec-server/v2/ec_system.h"
 #include "ec-server/v2/utils.h"
 
+int homing_to_move_toggle = 0;
 
 void ECAT2_view(){
 
@@ -330,30 +331,11 @@ ECAT2_PHASE ECAT2_homing(int motor){
 
          _PHASE_ = ECAT2_MOVING;
 
+         phase_toggle = 1;
+
          printf("[INFO] All motors have completed homing\n");
 
 
-         // set software limit to -200000 and 200000 by sdo
-
-         if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x01, -200000) == 0)
-
-         {
-
-            printf("\033[1;31m[ERROR] Failed to set position min. limit for motor %d\033[0m\n", motor);
-
-            return ECAT2_ABORT;
-
-         }
-
-         if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x02, 200000) == 0)
-
-         {
-
-            printf("\033[1;31m[ERROR] Failed to set position max. limit for motor %d\033[0m\n", motor);
-
-            return ECAT2_ABORT;
-
-         }
 
       } 
    }
@@ -457,6 +439,32 @@ ECAT2_PHASE ECAT2_homing(int motor){
 }
 
 ECAT2_PHASE ECAT2_moving(int motor){
+
+
+   if(phase_toggle){
+
+      if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x01, -200000) == 0)
+
+      {
+
+         printf("\033[1;31m[ERROR] Failed to set position min. limit for motor %d\033[0m\n", motor);
+
+         return ECAT2_ABORT;
+
+      }
+
+      if (write_sdo_s32(motor + 1, OD_SOFTWARE_LIMIT, 0x02, 200000) == 0)
+
+      {
+
+         printf("\033[1;31m[ERROR] Failed to set position max. limit for motor %d\033[0m\n", motor);
+
+         return ECAT2_ABORT;
+
+      }
+
+      phase_toggle = 0;
+   }
 
 
    motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
