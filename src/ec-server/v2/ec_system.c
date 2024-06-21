@@ -960,15 +960,15 @@ void ECAT2_homing(){
       }
 
 
-      if (motor_txpdos[motor]->mode_of_operation_display == 0x01 && TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_PP_SETPOINT_ACKNOWLEDGE))
+      if (motor_txpdos[motor]->mode_of_operation_display == MODE_PP && TEST_BIT(motor_txpdos[motor]->status_word, BIT_STATUS_WORD_PP_SETPOINT_ACKNOWLEDGE))
 
       {
 
          // reset new_set_point to 0 in profile position mode
 
-         motor_rxpdos[motor]->control_word = CONTROL_WORD_NEW_SET_POINT;
+         motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_NEW_SET;
 
-         motor_rxpdos[motor]->mode_of_operation = 0x01;
+         motor_rxpdos[motor]->mode_of_operation = MODE_PP;
 
          continue;
 
@@ -1080,8 +1080,8 @@ void ECAT2_homing(){
 
          {
 
-            motor_rxpdos[motor]->control_word = CONTROL_WORD_CHANGE_SET_IMMEDIATELY;
-            motor_rxpdos[motor]->mode_of_operation = 0x01;
+            motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
+            motor_rxpdos[motor]->mode_of_operation = MODE_PP;
 
             motor_rxpdos[motor]->profile_velocity = VELOCITY_TO_START_OFFSET;
 
@@ -1126,9 +1126,9 @@ void ECAT2_homing(){
 
             printf("[INFO] Motor:%d, Start homing. status word:0x%x, homing error:%d, homing attained:%d\n", motor, motor_txpdos[motor]->status_word, homing_error, homing_attained);
 
-            motor_rxpdos[motor]->mode_of_operation = 0x06;
+            motor_rxpdos[motor]->mode_of_operation = MODE_HM;
 
-            motor_rxpdos[motor]->control_word = 0x001F;
+            motor_rxpdos[motor]->control_word = CONTROL_WORD_HM_OP_START;
 
          }
 
@@ -1160,8 +1160,8 @@ void ECAT2_moving(){
 
    for(int motor = 0 ; motor < ec_slavecount; motor++){
 
-      motor_rxpdos[motor]->control_word = CONTROL_WORD_CHANGE_SET_IMMEDIATELY;
-      motor_rxpdos[motor]->mode_of_operation = 0x01;
+      motor_rxpdos[motor]->control_word = CONTROL_WORD_PP_CHANGE_SET;
+      motor_rxpdos[motor]->mode_of_operation = MODE_PP;
 
       motor_rxpdos[motor]->profile_velocity = 1500000;
 
