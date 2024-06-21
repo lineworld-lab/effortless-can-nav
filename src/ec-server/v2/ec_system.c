@@ -651,35 +651,66 @@ void ECAT2_lifecycle(char *ifname)
 
    }
 
+   int control_stat = 0;
 
-   int exchange_stat = 0;
-
-   /* exchange loop */
+   /* control loop */
 
    while (1)
-
    {
 
-      exchange_stat = ECAT2_exchange();
+      control_stat = ECAT2_exchange();
 
-      if(exchange_stat < 0){
+      if(control_stat < 0){
 
-         return;
+         break;
 
-      } else if (exchange_stat == 0){
+      } else if (control_stat == 0){
 
          continue;
 
       }
 
+      control_stat = ECAT2_sync_status();
+
+      if(control_stat < 0){
+
+         break;
+
+      } else if (control_stat == 0){
+
+         continue;
+
+      }    
+
+
       if (_PHASE_ == ECAT2_HOMING){
 
-         ECAT2_homing();
+         control_stat = ECAT2_homing();
+
+         if(control_stat < 0){
+
+            break;
+
+         } else if (control_stat == 0){
+
+            continue;
+
+         }
 
 
       } else if (_PHASE_ == ECAT2_MOVING){
 
-         ECAT2_moving();
+         control_stat = ECAT2_moving();
+
+         if(control_stat < 0){
+
+            break;
+
+         } else if (control_stat == 0){
+
+            continue;
+
+         }
 
       }
 
@@ -729,8 +760,6 @@ int ECAT2_exchange(){
 
       printf("\033[1;31m[ERROR] Workcounter not met (actual WKC:%d, expected WKC:%d)\033[0m\n", wkc, expectedWKC);
 
-      ECAT2_shutdown();
-
       return -1;
 
    }
@@ -754,8 +783,6 @@ int ECAT2_exchange(){
 
       printf("\033[1;31m[ERROR] Workcounter fail count exceeds threshold. Exiting...\033[0m\n");
 
-      ECAT2_shutdown();
-
       return -1;
 
    }
@@ -768,9 +795,7 @@ int ECAT2_exchange(){
 }
 
 
-void ECAT2_homing(){
-
-
+int ECAT2_sync_status(){
 
    for(int motor = 0; motor < ec_slavecount; motor++){
 
@@ -796,9 +821,7 @@ void ECAT2_homing(){
 
             printf("\033[1;31m[ERROR] Error count exceeds threshold. Exiting...\033[0m\n");
 
-            ECAT2_shutdown();
-
-            return;
+            return -1;
 
          }
 
@@ -951,9 +974,7 @@ void ECAT2_homing(){
 
             printf("[ERROR] Motor:%d, Unknown status word:0x%x\n", motor, motor_txpdos[motor]->status_word);
 
-            ECAT2_shutdown();
-
-            return;
+            return -1;
 
          }
 
@@ -973,6 +994,21 @@ void ECAT2_homing(){
          continue;
 
       }
+
+
+
+   }
+
+   return 1;
+
+
+}
+
+
+int ECAT2_homing(){
+
+
+   for(int motor = 0; motor < ec_slavecount; motor++){
 
 
       if (!has_moved_to_start_offset){
@@ -1031,9 +1067,7 @@ void ECAT2_homing(){
 
                printf("\033[1;31m[ERROR] Failed to set position min. limit for motor %d\033[0m\n", motor);
 
-               ECAT2_shutdown();
-
-               return;
+               return -1;
 
             }
 
@@ -1043,9 +1077,7 @@ void ECAT2_homing(){
 
                printf("\033[1;31m[ERROR] Failed to set position max. limit for motor %d\033[0m\n", motor);
 
-               ECAT2_shutdown();
-
-               return;
+               return -1;
 
             }
 
@@ -1114,9 +1146,7 @@ void ECAT2_homing(){
 
             printf("\033[1;31m[ERROR] Motor %d has failed to reach home position\033[0m\n", motor);
 
-            ECAT2_shutdown();
-
-            return;
+            return -1;
 
          }
 
@@ -1149,14 +1179,14 @@ void ECAT2_homing(){
       }
 
 
-
    }
 
 
+   return 1;
+
 }
 
-
-void ECAT2_moving(){
+int ECAT2_moving(){
 
    for(int motor = 0 ; motor < ec_slavecount; motor++){
 
@@ -1228,6 +1258,8 @@ void ECAT2_moving(){
 
 
    }
+
+   return 1;
 
 }
 
