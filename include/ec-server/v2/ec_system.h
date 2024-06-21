@@ -16,13 +16,13 @@ void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
 
-int ECAT2_exchange();
+int ECAT2_exchange(int motor);
 
-int ECAT2_sync_status();
+int ECAT2_sync_status(int motor);
 
-int ECAT2_homing();
+int ECAT2_homing(int motor);
 
-int ECAT2_moving();
+int ECAT2_moving(int motor);
 
 
 
