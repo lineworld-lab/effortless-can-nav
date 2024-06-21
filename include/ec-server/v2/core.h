@@ -172,8 +172,12 @@ extern servo_txpdo_t **motor_txpdos;
 
 typedef enum ECAT2_PHASE {
 
-    ECAT2_HOMING,
-    ECAT2_MOVING
+   ECAT2_ABORT,
+   ECAT2_CONTINUE,
+   ECAT2_FORWARD,
+   ECAT2_HOMING,
+   ECAT2_MOVING,
+    
 
 } ECAT2_PHASE;
 

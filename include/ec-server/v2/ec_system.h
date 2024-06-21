@@ -5,6 +5,7 @@
 #include "ec-server/v2/core.h"
 
 
+// system
 
 void ECAT2_sigint_handler(int signum);
 
@@ -16,18 +17,22 @@ void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
 
-int ECAT2_exchange(int motor);
-
-int ECAT2_sync_status(int motor);
-
-int ECAT2_homing(int motor);
-
-int ECAT2_moving(int motor);
-
-
-
 OSAL_THREAD_FUNC ECAT2_check(void *ptr);
 
+
+// modules
+
+void ECAT2_view();
+
+ECAT2_PHASE ECAT2_exchange(int motor);
+
+ECAT2_PHASE ECAT2_sync_status(int motor);
+
+ECAT2_PHASE ECAT2_homing(int motor);
+
+ECAT2_PHASE ECAT2_moving(int motor);
+
+// utils
 
 int read_sdo_u8(uint16 slave, uint16 index, uint8 subindex, uint8 *read_data);
 
