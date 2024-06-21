@@ -51,7 +51,7 @@ int error_count = 0;
 
 int debug_mode = 0;
 
-int homing_at_start = 1;
+
 
 // Home sensor position from front, anti-clockwise. 400000 is one rotation
 
@@ -68,6 +68,19 @@ servo_rxpdo_t **motor_rxpdos = NULL;
 servo_txpdo_t **motor_txpdos = NULL;
 
 
+
+ECAT2_PHASE _PHASE_;
+
+
+int *arr_initial_positions = NULL;
+
+int *arr_has_moved_to_start_offset = NULL;
+
+int has_moved_to_start_offset = 0;
+
+int *arr_is_homing_done = NULL;
+
+int *arr_move_fail_count = NULL;
 
 pthread_t ECAT2_tid;
 

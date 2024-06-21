@@ -5,6 +5,7 @@
 #include "ec-server/v2/core.h"
 
 
+
 void ECAT2_sigint_handler(int signum);
 
 void ECAT2_shutdown();
@@ -14,6 +15,12 @@ int ECAT2_init_slave(uint16 slave);
 void ECAT2_init_pdo(ec_slavet *ec_slave);
 
 void ECAT2_lifecycle(char *ifname);
+
+void ECAT2_homing();
+
+void ECAT2_moving();
+
+
 
 OSAL_THREAD_FUNC ECAT2_check(void *ptr);
 

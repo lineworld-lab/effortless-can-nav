@@ -187,7 +187,16 @@ int InitRuntimeFrom(char* filename){
 
     cJSON *homing_at_start_ = cJSON_GetObjectItemCaseSensitive(conf_json, "homing_at_start");
 
-    homing_at_start = homing_at_start_->valueint;
+    int homing_at_start = homing_at_start_->valueint;
+
+    if(homing_at_start == 1){
+
+        _PHASE_ = ECAT2_HOMING;
+
+    } else {
+
+        _PHASE_ = ECAT2_MOVING;
+    }
 
 
     free(source);
@@ -214,6 +223,23 @@ int AllocRuntime(){
 
     motor_txpdos = (servo_txpdo_t **)malloc(g_num_of_slaves * sizeof(servo_txpdo_t*));
 
+
+
+    arr_initial_positions = (int*)malloc(g_num_of_slaves * sizeof(int));
+
+    memset(arr_initial_positions, 0 , g_num_of_slaves * sizeof(int));
+
+    arr_has_moved_to_start_offset = (int*)malloc(g_num_of_slaves * sizeof(int));
+
+    memset(arr_has_moved_to_start_offset, 0 , g_num_of_slaves * sizeof(int));
+
+    arr_is_homing_done = (int*)malloc(g_num_of_slaves * sizeof(int));
+
+    memset(arr_is_homing_done, 0 , g_num_of_slaves * sizeof(int));
+
+    arr_move_fail_count = (int*)malloc(g_num_of_slaves * sizeof(int));
+
+    memset(arr_move_fail_count, 0 , g_num_of_slaves * sizeof(int));
 
 }
 
@@ -268,5 +294,57 @@ void FreeRuntime(){
       free(motor_txpdos);
 
    } while(0);
+
+
+   do {
+
+      if(arr_initial_positions == NULL) {
+
+         break;
+      }
+
+      free(arr_initial_positions);
+
+   } while (0);
+
+
+   do {
+
+      if(arr_has_moved_to_start_offset == NULL) {
+
+         break;
+      }
+
+      free(arr_has_moved_to_start_offset);
+
+   } while (0);
+
+
+
+   do {
+
+      if(arr_is_homing_done == NULL) {
+
+         break;
+      }
+
+      free(arr_is_homing_done);
+
+   } while (0);
+
+
+
+   do {
+
+      if(arr_move_fail_count == NULL) {
+
+         break;
+      }
+
+      free(arr_move_fail_count);
+
+   } while (0);
+
+
 
 }
