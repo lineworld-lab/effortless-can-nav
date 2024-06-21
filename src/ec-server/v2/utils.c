@@ -193,9 +193,13 @@ int InitRuntimeFrom(char* filename){
 
         _PHASE_ = ECAT2_HOMING;
 
+        phase_toggle = 0;
+
     } else {
 
         _PHASE_ = ECAT2_MOVING;
+
+        phase_toggle = 1;
     }
 
 
