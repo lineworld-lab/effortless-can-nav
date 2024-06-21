@@ -18,9 +18,11 @@ void ECAT2_lifecycle(char *ifname);
 
 int ECAT2_exchange();
 
-void ECAT2_homing();
+int ECAT2_sync_status();
 
-void ECAT2_moving();
+int ECAT2_homing();
+
+int ECAT2_moving();
 
 
 
