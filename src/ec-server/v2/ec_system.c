@@ -654,7 +654,7 @@ void ECAT2_lifecycle(char *ifname)
 
    /* cyclic loop */
 
-   while (true)
+   while (1)
 
    {
 
@@ -681,6 +681,73 @@ void ECAT2_lifecycle(char *ifname)
 
 
 void ECAT2_homing(){
+
+   for (int motor = 0; motor < ec_slavecount; motor++)
+
+   {
+
+      printf_debug("\033[38;5;208m[DEBUG] Motor:%d, Control Word:0x%x, Target Position:%d, Profile Velocity:%d, Mode of Operation:0x%x\033[0m\n",
+
+                     motor,
+
+                     motor_rxpdos[motor]->control_word,
+
+                     motor_rxpdos[motor]->target_position,
+
+                     motor_rxpdos[motor]->profile_velocity,
+
+                     motor_rxpdos[motor]->mode_of_operation);
+
+   }
+
+
+   osal_usleep(50000);
+
+   ec_send_processdata();
+
+   wkc = ec_receive_processdata(EC_TIMEOUTRET);
+
+
+   if (wkc == -1)
+
+   {
+
+      printf("\033[1;31m[ERROR] Workcounter not met (actual WKC:%d, expected WKC:%d)\033[0m\n", wkc, expectedWKC);
+
+      close_ethercat();
+
+      return;
+
+   }
+
+   else if (wkc < expectedWKC)
+
+   {
+
+      printf("\033[1;31m[ERROR] Workcounter not met (actual WKC:%d, expected WKC:%d)\033[0m\n", wkc, expectedWKC);
+
+      working_counter_fail_count++;
+
+      continue;
+
+   }
+
+
+   if (working_counter_fail_count >= WORKING_COUNTER_FAIL_THRESHOLD)
+
+   {
+
+      printf("\033[1;31m[ERROR] Workcounter fail count exceeds threshold. Exiting...\033[0m\n");
+
+      close_ethercat();
+
+      return;
+
+   }
+
+
+   working_counter_fail_count = 0;
+
 
 
    for(int motor = 0; motor < ec_slavecount; motor++){
@@ -983,7 +1050,7 @@ void ECAT2_homing(){
 
             printf("[INFO] Motor %d has reached start offset\n", motor);
 
-            arr_has_moved_to_start_offset[motor] = true;
+            arr_has_moved_to_start_offset[motor] = 1;
 
          }
 
@@ -1050,7 +1117,7 @@ void ECAT2_homing(){
 
             printf("[INFO] Motor %d has reached home position\n", motor);
 
-            arr_is_homing_done[motor] = true;
+            arr_is_homing_done[motor] = 1;
 
             motor_rxpdos[motor]->target_position = 0;
 
@@ -1186,7 +1253,7 @@ OSAL_THREAD_FUNC ECAT2_check(void *ptr)
 
             {
 
-               ec_group[currentgroup].docheckstate = TRUE;
+               ec_group[currentgroup].docheckstate = 1;
 
                if (ec_slave[slave].state == (EC_STATE_SAFE_OP + EC_STATE_ERROR))
 
@@ -1240,7 +1307,7 @@ OSAL_THREAD_FUNC ECAT2_check(void *ptr)
 
                   {
 
-                     ec_slave[slave].islost = TRUE;
+                     ec_slave[slave].islost = 1;
 
                      printf("[ERROR] : slave %d lost\n", slave);
 
