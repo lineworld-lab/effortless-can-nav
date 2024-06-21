@@ -714,7 +714,7 @@ void ECAT2_homing(){
 
       printf("\033[1;31m[ERROR] Workcounter not met (actual WKC:%d, expected WKC:%d)\033[0m\n", wkc, expectedWKC);
 
-      close_ethercat();
+      ECAT2_shutdown();
 
       return;
 
@@ -728,7 +728,7 @@ void ECAT2_homing(){
 
       working_counter_fail_count++;
 
-      continue;
+      return;
 
    }
 
@@ -739,7 +739,7 @@ void ECAT2_homing(){
 
       printf("\033[1;31m[ERROR] Workcounter fail count exceeds threshold. Exiting...\033[0m\n");
 
-      close_ethercat();
+      ECAT2_shutdown();
 
       return;
 
