@@ -1,0 +1,14 @@
+name: build test for libecat-bootstrap
+
+on :
+  push:
+    branches: [ main ]
+
+jobs:
+
+  build_test:
+    runs-on: ubuntu-20.04
+    steps: 
+      - run: git clone https://github.com/seantywork/libecat-bootstrap.git
+      - run: cd libecat-bootstrap && ecsh vendor
+      - run: cd libecat-bootstrap && ecsh build
