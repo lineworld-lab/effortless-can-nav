@@ -1,46 +1,96 @@
-1. ecsh 사용법
+1. Using ecsh 
+ecsh_help: Displays the help message.
 
-ㅁ ecsh_help : help 메시지 출력
+ecsh_vendor: Downloads and builds the external libraries SOEM and cJSON.
 
-ㅁ ecsh_vendor : 외부 라이브러리인 SOEM과 cJSON을 다운로드 및 빌드
+ecsh_build: Deletes the existing build if it exists, creates a new build folder, and builds with CMake.
 
-ㅁ ecsh_build : 기존에 build가 있다면 삭제 후 새 build 폴더 만든 후 cmake 빌드
+ecsh_vendor_rt: Installs the real-time library EtherCAT.
 
-ㅁ ecsh_vendor_rt : 실시간 라이브러리인 EtherCAT 설치
+ecsh_build_rt: Performs the real-time build.
 
-ㅁ ecsh_build_rt : 실시간 빌드 수행
+ecsh_run: Executes the program.
 
-ㅁ ecsh_run : 실행
+When you run ./ecsh help, ./ecsh vendor, or ./ecsh build, it executes according to each corresponding command.
 
-2. 2. 
 
-ㅁ int RunInteractive() {  } : Keep 변수는 0으로 초기화, 이 조건이 참일 때까지 반복문이 실행.
+2. Config Modification
 
-ㅁ While (keep == 0) {  } : 명령어가 입력될 때까지 무한 루프 실행
+When using the ifconfig command from the raspi account, the IP address can be confirmed as 192.168.50.177 9999. After running cat ecctl, the content was not understandable, so I installed hexedit with sudo apt install hexedit and used hexedit ecctl to identify that the file is a binary file and to check its contents.
 
-ㅁ fgets(line, MAX_BUFFLEN, stdin); : fgets 함수를 사용해 입력을 받고 내용은 line 배열에 저장.
+3. Using ecctl
 
-ㅁ int line_len = strlen(line) : 입력된 문자열의 길이를 확인
+When using cat ecctl, the content was not understandable, so I installed hexedit with sudo apt install hexedit and used hexedit ecctl to identify that the file is a binary file and to check its contents.
 
-ㅁ if (line[i] == '\n') {
-        line[i] = '\0'; : 개행 문자(\n)를 널 문자(\0)으로 바꾼다. 문자열의 끝을 명시하는 역활
 
-ㅁ char* tok = strtok(line, delim) : strtok 함수를 사용해 입력된 문자열(“ ”)을 기준으로 토큰화한다.
 
-ㅁ if (arg_len == 0) ~ else : 첫 번째 토큰은 malloc 사용하여 메모리 할당 | 그 이후 토큰은 realloc 사용하여 메모리 재할당
 
-ㅁ if (strcmp(runtime_args[0], "connect") == 0) : ret_code가 0보다 작으면 실패 메시지 출력
 
-ㅁ else if (strcmp(runtime_args[0], "send") == 0) : send 명령어를 입력 후 데이터 전송
- 	res 배열은 전송 결과를 저장 후 전송 여부에 따라 메시지 출력
 
-ㅁ else if (strcmp(runtime_args[0], "disconnect") == 0) : 연결을 종료
 
-ㅁ else { } : 명령어와 일치하지 않은 경우, 유효하지 않은 인수 메시지를 출력
 
-ㅁ int ConnectTo(char* res, int arg_len, char** runtime_args) : 
 
-ㅁ if (arg_len < 3) : 인수의 개수가 3 미만인 경우 오류 메시지를 출력하고 –1 반환
-		     필요한 인수는 address와 port 
 
-ㅁ ret_code = InitECCmdGatewayWithTimeout(res, addr, port, 5000); : 주소와 포트로 연결 시도
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
++ off topic
+int RunInteractive() {  } 
+// The variable 'keep' is initialized to 0, and the loop runs until this condition is true.
+
+while (keep == 0) {  } 
+// An infinite loop executes until a command is entered.
+
+fgets(line, MAX_BUFFLEN, stdin); 
+// Use the fgets function to read input, and store the content in the 'line' array.
+
+int line_len = strlen(line); 
+// Check the length of the input string.
+
+if (line[i] == '\n')  
+    line[i] = '\0'; 
+	// Replace the newline character (\n) with a null character (\0), indicating the end of the string.
+
+
+char* tok = strtok(line, delim); 
+// Use the strtok function to tokenize the input string based on the delimiter (" ").
+
+if (arg_len == 0) ~ else 
+// Allocate memory using malloc for the first token, and use realloc for reallocating memory for subsequent tokens.
+
+if (strcmp(runtime_args[0], "connect") == 0) 
+// If ret_code is less than 0, print a failure message.
+
+else if (strcmp(runtime_args[0], "send") == 0) 
+// After entering the send command, transmit data. The 'res' array stores the transmission 
+
+results and prints messages based on the transmission status.
+else if (strcmp(runtime_args[0], "disconnect") == 0)  
+// Terminate the connection.
+
+else  
+// If the command does not match, print a message indicating an invalid argument.
+
+
+int ConnectTo(char* res, int arg_len, char** runtime_args) 
+    if (arg_len < 3) 
+    // If the number of arguments is less than 3, print an error message and return -1. The required arguments are address and port.
+    
+    
+ret_code = InitECCmdGatewayWithTimeout(res, addr, port, 5000); 
+// Connect using the address and port.
+
