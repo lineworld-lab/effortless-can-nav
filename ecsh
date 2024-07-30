@@ -3,36 +3,76 @@
 
 set -euo pipefail
 
-
+ 
 
 
 CMD="$1"
 
 
 
+# Function to display help message
 ecsh_help () {
 
-
     echo "ecsh: help"
+    echo "Usage: ./ecsh [COMMAND]"
+    echo ""
+
+    echo "Commands:"
+    echo "  help            Display this help message."
+    echo "  vendor          Download and build vendor dependencies (SOEM and cJSON)."
+    echo "  build           Build the project."
+    echo "  clean           Clean vendor directories."
+    echo "  server          Run the server with root permissions."
+    echo "  client          Connect to the server."
+    echo ""
+
+    echo "Examples:"
+    echo "  ./ecsh help"
+    echo "  ./ecsh vendor"
+    echo "  ./ecsh build"
+    echo "  ./ecsh clean"
+    echo "  ./ecsh server"
+    echo "  ./ecsh client"
+    echo ""
+
+    echo "Operating sequence"
+    echo "./ecsh vendor -> ./ecsh build -> ./ecsh server -> ./ecsh client"
+    echo ""
+
+    }
 
 
-}
 
-
-
+# Function to handle vendor dependencies
 ecsh_vendor () {
 
 
     echo "ecsh: vendor"
 
+    if command -v cmake &> /dev/null; then
+        echo "cmake is already installed, removing..."
+        sudo apt remove --purge -y cmake
+    fi
+    echo "installing cmake..."
+    sudo apt update
+    sudo apt install -y cmake
+    
     cd vendor
 
     # SOEM 
 
-    git clone https://github.com/OpenEtherCATsociety/SOEM.git
+    if [ -d "./SOEM" ]; then
+        echo "SOEM already exists, skipping clone"
+    else
+        git clone https://github.com/OpenEtherCATsociety/SOEM.git
+    fi
 
     cd SOEM
 
+    if [ -d "build" ]; then
+        sudo rm -r build
+    fi
+    
     mkdir build 
 
     cd build 
@@ -57,6 +97,8 @@ ecsh_vendor () {
 }
 
 
+
+# Function to build the project
 ecsh_build(){
 
 
@@ -82,6 +124,7 @@ ecsh_build(){
 
 
 
+# Function to handle real-time vendor dependencies
 ecsh_vendor_rt () {
 
 
@@ -137,9 +180,7 @@ ecsh_vendor_rt () {
 
 
 
-
-
-
+# Function to build the project with real-time support
 ecsh_build_rt(){
 
 
@@ -165,11 +206,41 @@ ecsh_build_rt(){
 
 
 
+# Function to clean vendor directories
+ecsh_clean (){
 
-ecsh_run(){
+    echo "ecsh: clean"
+
+    read -p "Are you sure you want to delete all build files and directories? [y/n]: " confirm
+    if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+        echo "Clean operation cancelled."
+        return
+    fi
+
+    if [ -d "./vendor/SOEM/build" ]; then
+        echo "Removing SOEM build directory..."
+        sudo rm -r ./vendor/SOEM/build
+    fi
+
+    if [ -d "./vendor/cJSON" ]; then
+        echo "Removing cJSON directory..."
+        sudo rm -r ./vendor/cJSON
+    fi
+
+    echo "Clean operation completed."
+}
 
 
-    echo "ecsh: run"
+
+# Function to run the server with root permissions
+ecsh_server () {
+
+    echo "ecsh: server"
+
+    if [ "$(id -u)" -ne 0 ]; then
+        echo "This command must be run as root."
+        exit 1
+    fi
 
     if [ ! -d "./build" ]
     then
@@ -180,8 +251,28 @@ ecsh_run(){
     cp -Rf ./config/config.json ./build
 
     cd build && sudo ./ecserver
+    
+}
+
+
+# Function to execute ecctl command
+ecsh_client () {
+    if [ ! -d "./build" ]; then
+        echo "Error: build directory does not exist. Please build the project first."
+        exit 1
+    fi
+
+    cd build
+
+    ./ecctl
 
 }
+
+
+
+
+
+
 
 
 
@@ -225,6 +316,27 @@ then
 
     ecsh_run
 
+elif [ "$CMD" == "clean" ]
+then
+
+    ecsh_clean
+
+
+
+elif [ "$CMD" == "server" ]
+then
+
+    ecsh_server
+
+
+
+elif [ "$CMD" == "client" ]
+then
+
+    ecsh_client
+
+
+
 else 
 
     echo "invalid cmd: $CMD"
@@ -232,5 +344,3 @@ else
 
 
 fi
-
-
