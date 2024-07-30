@@ -7,9 +7,9 @@
 ./ecsh build
 ㅁ The ecserver program is ready to run. You can use the ./ecsh run command to execute it.
 
-./ecsh vendor rt: Installs the real-time library EtherCAT.
+./ecsh vendor_rt: Installs the real-time library EtherCAT.
 
-./ecsh build rt: Performs the real-time build.
+./ecsh build_rt: Performs the real-time build.
 
 ./ecsh run: Executes the program.
 ㅁ The SOEM library is started, and this library functions as a master. The servo controller is initialized, and the home sensor information for each motor and the start offset values are displayed.
@@ -23,6 +23,6 @@ In homing_at_start, if there is no need to automatically move to the home positi
 
 3. Using ecctl
 
-./ecctl -> connect 192.168.50.177 9999 -> send -> axis tmo params
+./ecctl -> connect IP PORT -> send -> axis tmo params
 By entering the command ./ecctl -> connect 192.168.50.177 9999 -> send -> axis tmo params, you can adjust the parameters of the desired wheel.
 
