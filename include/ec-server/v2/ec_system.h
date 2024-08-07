@@ -5,6 +5,18 @@
 #include "ec-server/v2/core.h"
 
 
+typedef struct {
+    const char* cmd;
+    const char* args1;
+    const char* args2;
+    const char* comment;
+} AvailableCmd;
+
+extern const AvailableCmd available_cmd[];
+
+extern const int available_cmd_count;
+
+
 // system
 
 void ECAT2_sigint_handler(int signum);
