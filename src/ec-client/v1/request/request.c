@@ -607,3 +607,37 @@ int TryInitECCmdGateway(char* res){
 
 
 }
+
+int ECCmdGatewayStr(char* res, const char* cmd) {
+    if(VCONN != 1){
+        return -100;
+    }
+
+    char send_buff[MAX_BUFFLEN] = {0};
+    char recv_buff[MAX_BUFFLEN] = {0};
+    int valsent;
+    int valread = 0;
+
+    strncpy(send_buff, cmd, MAX_BUFFLEN - 1);
+
+    valsent = write(SOCK_FD, send_buff, MAX_BUFFLEN);
+
+    if(valsent < 1){
+        strcpy(res, "error send");
+        return -1;
+    }
+
+    while(valread < MAX_BUFFLEN){
+        int tmpread = read(SOCK_FD, recv_buff + valread, MAX_BUFFLEN - valread);
+        if(tmpread < 1){
+            strcpy(res, "error read");
+            return -2;
+        }
+        valread += tmpread;
+    }
+
+    strncpy(res, recv_buff, MAX_RESULT_STRLEN - 1);
+    res[MAX_RESULT_STRLEN - 1] = '\0';
+
+    return 0;
+}

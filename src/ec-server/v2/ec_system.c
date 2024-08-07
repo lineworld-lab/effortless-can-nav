@@ -3,6 +3,15 @@
 #include "ec-server/v2/utils.h"
 
 
+const AvailableCmd available_cmd[] = {
+    { .cmd = "hc", .args = "axis", .comment = "Home Check" },
+    { .cmd = "tmo", .args = "axis position", .comment = "Try Move Override" },
+    { .cmd = "DIEBRO", .args = "No arguments", .comment = "Disconnect" },
+    { .cmd = "discovery", .args = "No arguments", .comment = "List available commands" }
+};
+
+const int available_cmd_count = sizeof(available_cmd) / sizeof(AvailableCmd);
+
 void ECAT2_sigint_handler(int signum)
 
 {
