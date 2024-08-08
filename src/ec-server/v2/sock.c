@@ -386,6 +386,12 @@ int GetAvailableCommands(char* res) {
     char* current = res;
     int remaining = MAX_RESULT_STRLEN;
     int written = snprintf(current, remaining, "List of available command and arguments:\n");
+
+    if (written < 0 || written >= remaining) {
+        strcpy(res, "Buffer overflow in GetAvailableCommands");
+        return -1;
+    }
+
     current += written;
     remaining -= written;
 
@@ -401,8 +407,18 @@ int GetAvailableCommands(char* res) {
 
                            available_cmd[i].comment
                            );
+        if (written < 0 || written >= remaining) {
+            strcat(res, "\nBuffer overflow, command list truncated");
+            return -2;
+        }
+        
         current += written;
         remaining -= written;
+    }
+
+    if (remaining <= 0) {
+        strcat(res, "\nBuffer overflow, command list may be incomplete");
+        return -3;
     }
 
     return 0;

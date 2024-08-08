@@ -636,8 +636,18 @@ int ECCmdGatewayStr(char* res, const char* cmd) {
         valread += tmpread;
     }
 
+    char* response = malloc(MAX_RESULT_STRLEN);
+    if (!response) {
+        strcpy(res, "Memory allocation failed");
+        return -3;
+    }
+    
+    strncpy(response, recv_buff, MAX_RESULT_STRLEN - 1);
+    response[MAX_RESULT_STRLEN - 1] = '\0';
+
     strncpy(res, recv_buff, MAX_RESULT_STRLEN - 1);
     res[MAX_RESULT_STRLEN - 1] = '\0';
 
+    free(response);
     return 0;
 }
