@@ -126,6 +126,22 @@ int RunInteractive(){
 
             keep = 1;
 
+        }  else if(strcmp(runtime_args[0], "discovery") == 0){
+
+            char res[MAX_RESULT_STRLEN] = {0};      
+
+            ret_code = Discovery(res, arg_len, runtime_args);
+
+            if(ret_code<0){
+
+                printf("discovery failed\n");
+            }
+            else {
+
+                printf("discovery success\n");
+                printf("%s\n", res);
+            }
+
         }else {
 
             printf("invalid argument: %s\n",runtime_args[0]);
@@ -215,84 +231,63 @@ int SendTo(char* res, int arg_len, char** runtime_args){
 
         }
 
-        AxisReq ar;
+    fgets(new_buff, 1024, stdin);
+    printf("fgets: %s\n", new_buff);
 
-        memset(&ar, 0, sizeof(AxisReq));
-
-        fgets(new_buff, 1024, stdin);
-
-        printf("fgets: %s\n", new_buff);
-
-        int in_buff_len = strlen(new_buff);
-
-        for(int i = 0; i < in_buff_len; i++){
-
-            if(new_buff[i] == '\n'){
-                new_buff[i] = '\0';
-            }
-
-
-        }
-
-        if(strcmp(new_buff, "abort") == 0){
-            
-            printf("ABORT.\n");
-            
-            ret_code = 1;
-
-            break;
-
-        } else if(strcmp(new_buff, "send") == 0){
-            
-            printf("SEND.\n");
-
-            ret_code = ECCmdGatewayAR(res, var_count, var);
-
-
-            break;
-
-
-        } 
-
-
-        int idx = 0;
-
-        char* pch = strtok(new_buff, " ");
-
-        while(pch != NULL){
-
-            if(idx == 0){
-
-                sscanf(pch, "%d", &(ar.axis));
-
-            } else if (idx == 1){
-
-                strcpy(ar.action, pch);
-
-            } else {
-
-                strcat(ar.params, pch);
-
-                strcat(ar.params, " ");
-            }
-
-            pch = strtok(NULL, " ");
-
-            idx += 1;
-
-        }
-
-        ar.status = 0;
-        ar.feedback = 0;
-
-        var[var_count] = ar;
-
-        var_count += 1;
-
-
+    
+    size_t in_buff_len = strlen(new_buff);
+    if (new_buff[in_buff_len - 1] == '\n') {
+        new_buff[in_buff_len - 1] = '\0';
     }
 
-    return ret_code;
+    
+    if (strcmp(new_buff, "abort") == 0) {
+        printf("ABORT.\n");
+        ret_code = 1;
+        break;
+    } 
+    
+    else if (strcmp(new_buff, "send") == 0) {
+        printf("SEND.\n");
+        ret_code = ECCmdGatewayAR(res, var_count, var);
+        break;
+    } 
+
+    
+    AxisReq ar;
+    memset(&ar, 0, sizeof(AxisReq));
+
+    char* pch = strtok(new_buff, " "); 
+    if (pch != NULL) {
+        sscanf(pch, "%d", &(ar.axis)); 
+        pch = strtok(NULL, " "); 
+    }
+    if (pch != NULL) {
+        strcpy(ar.action, pch); 
+        pch = strtok(NULL, " "); 
+    }
+    if (pch != NULL) {
+        strcpy(ar.params, pch); 
+    }
+
+    
+    int param_value = atoi(ar.params); 
+    if (ar.axis < 0 || ar.axis > 3 || 
+        strcmp(ar.action, "tmo") != 0 || 
+        param_value < 0 || param_value > 100000) {
+        ar.status = 1; 
+        ar.feedback = 0; 
+    } else {
+        ar.status = 0; 
+        ar.feedback = 1; 
+    }
+
+    
+    var[var_count] = ar;
+    var_count += 1;
+}
+
+return ret_code;
 }
 
 int DisconnectFrom(char* res, int arg_len, char** runtime_args){
@@ -316,4 +311,11 @@ int DisconnectFrom(char* res, int arg_len, char** runtime_args){
     return ret_code;
 
 
+}
+
+
+int Discovery(char* res, int arg_len, char** runtime_args) {
+    char discovery_cmd[] = "0 discovery";
+    int ret_code = ECCmdGatewayStr(res, discovery_cmd);
+    return ret_code;
 }

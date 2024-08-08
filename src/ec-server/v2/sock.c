@@ -253,6 +253,11 @@ int ProcessBuffer(char* res, char* req){
         status = 99;
 
 
+    } else if (strcmp(action, "discovery") == 0){
+
+      status = GetAvailableCommands(res);
+
+
     }  else {
 
         status = -1;
@@ -373,6 +378,32 @@ int PostPositionWithStatusFeedbackByAxis(char* res, int axis, int pos){
     strcat(res, " ");
 
     strcat(res, feedback_str);
+
+    return 0;
+}
+
+int GetAvailableCommands(char* res) {
+    char* current = res;
+    int remaining = MAX_RESULT_STRLEN;
+    int written = snprintf(current, remaining, "List of available command and arguments:\n");
+    current += written;
+    remaining -= written;
+
+    for (int i = 0; i < available_cmd_count && remaining > 0; i++) {
+
+        written = snprintf(current, remaining, "%s : %s %s %s : ex) %s\n", 
+
+                           available_cmd[i].cmd, 
+
+                           available_cmd[i].args1,
+                           available_cmd[i].cmd,
+                           available_cmd[i].args2,
+
+                           available_cmd[i].comment
+                           );
+        current += written;
+        remaining -= written;
+    }
 
     return 0;
 }
