@@ -24,6 +24,7 @@ ecsh_help () {
     echo "  clean           Clean vendor directories."
     echo "  server          Run the server with root permissions."
     echo "  client          Connect to the server."
+    echo "  gui_client      Run the GUI client."
     echo ""
 
     echo "Examples:"
@@ -33,10 +34,11 @@ ecsh_help () {
     echo "  ./ecsh clean"
     echo "  ./ecsh server"
     echo "  ./ecsh client"
+    echo "  ./ecsh gui_client"
     echo ""
 
     echo "Operating sequence"
-    echo "./ecsh vendor -> ./ecsh build -> ./ecsh server -> ./ecsh client"
+    echo "./ecsh vendor -> ./ecsh build -> sudo ./ecsh server -> ./ecsh client or ./ecsh gui_client"
     echo ""
 
     }
@@ -269,7 +271,33 @@ ecsh_client () {
 }
 
 
+# Function to run the GUI client
+ecsh_gui_client () {
+    echo "ecsh: GUI client"
 
+    if [ ! -f "./pyqt/ec_client_gui.py" ]; then
+        echo "Error: ec_client_gui.py does not exist in the pyqt directory."
+        exit 1
+    fi
+
+    # Check if Python is installed
+    if ! command -v python3 &> /dev/null; then
+        echo "Python3 is not installed. Please install Python3 to run the GUI client."
+        exit 1
+    fi
+
+    # Check if required Python packages are installed
+    required_packages="PyQt5 asyncio"
+    for package in $required_packages; do
+        if ! python3 -c "import $package" &> /dev/null; then
+            echo "Python package '$package' is not installed. Installing..."
+            pip3 install $package
+        fi
+    done
+
+    # Run the GUI client
+    python3 ./pyqt/ec_client_gui.py
+}
 
 
 
@@ -334,6 +362,14 @@ elif [ "$CMD" == "client" ]
 then
 
     ecsh_client
+
+
+
+
+elif [ "$CMD" == "gui_client" ]
+then
+
+    ecsh_gui_client
 
 
 
