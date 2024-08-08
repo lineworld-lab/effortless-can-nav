@@ -230,64 +230,84 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             printf("============\n");
 
         }
+         AxisReq ar;
 
-    fgets(new_buff, 1024, stdin);
-    printf("fgets: %s\n", new_buff);
+        memset(&ar, 0, sizeof(AxisReq));
 
-    
-    size_t in_buff_len = strlen(new_buff);
-    if (new_buff[in_buff_len - 1] == '\n') {
-        new_buff[in_buff_len - 1] = '\0';
+        fgets(new_buff, 1024, stdin);
+
+        printf("fgets: %s\n", new_buff);
+
+        int in_buff_len = strlen(new_buff);
+
+        for(int i = 0; i < in_buff_len; i++){
+
+            if(new_buff[i] == '\n'){
+                new_buff[i] = '\0';
+            }
+
+
+        }
+
+        if(strcmp(new_buff, "abort") == 0){
+            
+            printf("ABORT.\n");
+            
+            ret_code = 1;
+
+            break;
+
+        } else if(strcmp(new_buff, "send") == 0){
+            
+            printf("SEND.\n");
+
+            ret_code = ECCmdGatewayAR(res, var_count, var);
+
+
+            break;
+
+
+        } 
+
+
+        int idx = 0;
+
+        char* pch = strtok(new_buff, " ");
+
+        while(pch != NULL){
+
+            if(idx == 0){
+
+                sscanf(pch, "%d", &(ar.axis));
+
+            } else if (idx == 1){
+
+                strcpy(ar.action, pch);
+
+            } else {
+
+                strcat(ar.params, pch);
+
+                strcat(ar.params, " ");
+            }
+
+            pch = strtok(NULL, " ");
+
+            idx += 1;
+
+        }
+
+        ar.status = 0;
+        ar.feedback = 0;
+
+        var[var_count] = ar;
+
+        var_count += 1;
+
+
     }
 
-    
-    if (strcmp(new_buff, "abort") == 0) {
-        printf("ABORT.\n");
-        ret_code = 1;
-        break;
-    } 
-    
-    else if (strcmp(new_buff, "send") == 0) {
-        printf("SEND.\n");
-        ret_code = ECCmdGatewayAR(res, var_count, var);
-        break;
-    } 
-
-    
-    AxisReq ar;
-    memset(&ar, 0, sizeof(AxisReq));
-
-    char* pch = strtok(new_buff, " "); 
-    if (pch != NULL) {
-        sscanf(pch, "%d", &(ar.axis)); 
-        pch = strtok(NULL, " "); 
-    }
-    if (pch != NULL) {
-        strcpy(ar.action, pch); 
-        pch = strtok(NULL, " "); 
-    }
-    if (pch != NULL) {
-        strcpy(ar.params, pch); 
-    }
-
-    
-    int param_value = atoi(ar.params); 
-    if (ar.axis < 0 || ar.axis > 3 || 
-        strcmp(ar.action, "tmo") != 0 || 
-        param_value < 0 || param_value > 100000) {
-        ar.status = 1; 
-        ar.feedback = 0; 
-    } else {
-        ar.status = 0; 
-        ar.feedback = 1; 
-    }
-
-    
-    var[var_count] = ar;
-    var_count += 1;
-}
-
-return ret_code;
+    return ret_code;
 }
 
 int DisconnectFrom(char* res, int arg_len, char** runtime_args){
