@@ -126,6 +126,22 @@ int RunInteractive(){
 
             keep = 1;
 
+        }  else if(strcmp(runtime_args[0], "discovery") == 0){
+
+            char res[MAX_RESULT_STRLEN] = {0};      
+
+            ret_code = Discovery(res, arg_len, runtime_args);
+
+            if(ret_code<0){
+
+                printf("discovery failed\n");
+            }
+            else {
+
+                printf("discovery success\n");
+                printf("%s\n", res);
+            }
+
         }else {
 
             printf("invalid argument: %s\n",runtime_args[0]);
@@ -214,8 +230,7 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             printf("============\n");
 
         }
-
-        AxisReq ar;
+         AxisReq ar;
 
         memset(&ar, 0, sizeof(AxisReq));
 
@@ -316,4 +331,11 @@ int DisconnectFrom(char* res, int arg_len, char** runtime_args){
     return ret_code;
 
 
+}
+
+
+int Discovery(char* res, int arg_len, char** runtime_args) {
+    char discovery_cmd[] = "0 discovery";
+    int ret_code = ECCmdGatewayStr(res, discovery_cmd);
+    return ret_code;
 }
