@@ -33,10 +33,9 @@ int InitWheelDaemon(char* can_dev_name, int can_node_id){
  
     get_overriding_socket(LOCAL_SOCKET_NAME);
     
-    strcat(SET_LOCAL_SOCKET, "\"");
     strcat(SET_LOCAL_SOCKET, "local-");
     strcat(SET_LOCAL_SOCKET, LOCAL_SOCKET_NAME);
-    strcat(SET_LOCAL_SOCKET, "\"");
+
 
     int ret = pthread_create(&SOCK_PTID, NULL, &CO_daemon_start, NULL); 
 
