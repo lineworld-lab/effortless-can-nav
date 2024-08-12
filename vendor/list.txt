@@ -1,2 +1,3 @@
 ethercat: https://gitlab.com/etherlab.org/ethercat.git
+canopen: https://github.com/CANopenNode/CANopenLinux.git
 cJSON: https://github.com/DaveGamble/cJSON.git

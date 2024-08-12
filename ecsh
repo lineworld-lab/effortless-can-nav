@@ -51,15 +51,15 @@ ecsh_vendor () {
 
     echo "ecsh: vendor"
 
-    if command -v cmake &> /dev/null; then
-        echo "cmake is already installed, removing..."
-        sudo apt remove --purge -y cmake
-    fi
+#    if command -v cmake &> /dev/null; then
+#        echo "cmake is already installed, removing..."
+#        sudo apt remove --purge -y cmake
+#    fi
     echo "installing cmake..."
     sudo apt update
     sudo apt install -y cmake
     
-    cd vendor
+    pushd vendor
 
     # SOEM 
 
@@ -85,6 +85,27 @@ ecsh_vendor () {
 
     cd ../../
 
+    # CANopenLinux
+
+
+    if [ -d "./CANopenLinux" ]
+    then
+        echo "CANopenLinux already exists, skipping clone"
+    else 
+        git clone https://github.com/CANopenNode/CANopenLinux.git
+    fi
+    
+
+    cd CANopenLinux
+
+    git submodule init
+
+    git submodule update
+
+    make
+
+    cd ../
+
     # cJSON
 
     if [ -d "./cJSON" ]
@@ -95,6 +116,7 @@ ecsh_vendor () {
     git clone https://github.com/DaveGamble/cJSON.git
 
 
+    popd # vendor
 
 }
 
@@ -224,6 +246,12 @@ ecsh_clean (){
         sudo rm -r ./vendor/SOEM/build
     fi
 
+
+    if [ -d "./vendor/CANopenLinux" ]; then
+        echo "Removing CANopenLinux build directory..."
+        sudo rm -r ./vendor/CANopenLinux
+    fi
+
     if [ -d "./vendor/cJSON" ]; then
         echo "Removing cJSON directory..."
         sudo rm -r ./vendor/cJSON
@@ -251,6 +279,8 @@ ecsh_server () {
     fi
 
     cp -Rf ./config/config.json ./build
+
+    cp -Rf ./vendor/CANopenLinux/canopend ./build
 
     cd build && sudo ./ecserver
     

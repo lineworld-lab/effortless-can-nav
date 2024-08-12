@@ -3,4 +3,5 @@ build/
 vendor/cJSON
 vendor/ethercat
 vendor/SOEM
+vendor/CANopenLinux
 venv/
