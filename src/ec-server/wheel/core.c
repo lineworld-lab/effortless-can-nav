@@ -62,9 +62,9 @@ void* CO_daemon_start(void* varg){
 
     if(dpid == 0){
 
-        char* args = {"./canopend", CAN_DEV_NAME, "-i", CAN_NODE_ID_STR, "-c", SET_LOCAL_SOCKET};
+        char* args = {"./canopend", CAN_DEV_NAME, "-i", CAN_NODE_ID_STR, "-c", SET_LOCAL_SOCKET, NULL};
 
-        execve(args[0], args, NULL);
+        execvp(args[0], args);
 
     } else {
         
