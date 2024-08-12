@@ -3,6 +3,7 @@
 #include "ec-server/v2/ec_system.h"
 #include "ec-server/v2/sock.h"
 #include "ec-server/v2/utils.h"
+#include "ec-server/wheel/core.h"
 
 
 
@@ -107,6 +108,16 @@ int main(int argc, char *argv[])
 
    }
 
+
+   int wheel_result = InitWheelDaemon("can0", 77);
+
+   wheel_result = InitWheelCmdGateway();
+
+   if(wheel_result < 0){
+      printf("failed to init wheels\n");
+
+      return wheel_result;
+   }
 
    signal(SIGINT, ECAT2_sigint_handler);
 
