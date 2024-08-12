@@ -82,7 +82,7 @@ int InitWheelCmdGateway();
 int WheelCmdSetUp();
 
 
-void GetWheelCmd_TargetVelocity(char* incmd, int axis, int speed);
+void GetWheelCmd_TargetVelocity(char* incmd, int axis, char* speed);
 
 void GetWheelCmd_MotorEnable(char* incmd, int axis);
 
