@@ -12,6 +12,17 @@ typedef struct {
     const char* comment;
 } AvailableCmd;
 
+typedef enum AvailableCmdEnum {
+
+    ECCMD_HOME_CHECK = 0,
+    ECCMD_TRY_MOVE_OVERRIDE,
+    ECCMD_TRY_WHEEL_VELOCITY,
+    ECCMD_DISCONNECT,
+    ECCMD_DISCOVERY,
+    ECCMD_LEN
+
+} AvailableCmdEnum;
+
 extern const AvailableCmd available_cmd[];
 
 extern const int available_cmd_count;

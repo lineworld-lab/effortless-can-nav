@@ -41,22 +41,35 @@
 
 #define MAX_SOCK_PATH 108
 
+typedef struct WheelCmdStruct{
 
-extern pthread_t SOCK_PTID;
+    char index[16];
+    char subindex[16];
+    char datatype[16];
 
-extern pid_t DAEMON_PID;
+} WheelCmdStruct;
+
+
+extern pthread_t CAN_SOCK_PTID;
+
 
 extern FILE* TFP;
 
 extern char CAN_DEV_NAME[MAX_CAN_DEV_NAME];
 
-extern int CAN_NODE_ID;
+extern char CAN_NODE_ID_STR[MAX_CAN_NODE_NAME];
 
-extern int SOCKFD;
-
+extern int CAN_SOCKFD;
+extern char SET_LOCAL_SOCKET[MAX_SET_LOCAL_SOCK];
 extern char LOCAL_SOCKET_NAME[MAX_SOCK_PATH];
 
-
+extern WheelCmdStruct ecwheel_control_word;
+extern WheelCmdStruct ecwheel_rotation_direction;
+extern WheelCmdStruct ecwheel_actual_position;
+extern WheelCmdStruct ecwheel_actual_position_clear;
+extern WheelCmdStruct ecwheel_target_velocity;
+extern WheelCmdStruct ecwheel_acceleration;
+extern WheelCmdStruct ecwheel_deceleration;
 
 int InitWheelDaemon(char* can_dev_name, int can_node_id);
 
@@ -66,7 +79,28 @@ void* CO_daemon_start(void* varg);
 int InitWheelCmdGateway();
 
 
-int WheelCmdGatewayASCII(char* in, char* out);
+int WheelCmdSetUp();
+
+
+void GetWheelCmd_TargetVelocity(char* incmd, int axis, int speed);
+
+void GetWheelCmd_MotorEnable(char* incmd, int axis);
+
+void GetWheelCmd_MotorDisable(char* incmd, int axis);
+
+void GetWheelCmd_ClearEncoderValue(char* incmd, int axis);
+
+void GetWheelCmd_SetRotationClockwise(char* incmd, int axis);
+
+void GetWheelCmd_SetRotationCounterClockwise(char* incmd, int axis);
+
+
+void GetWheelCmd_SetAcceleration(char* incmd, int axis, int accel);
+
+
+void GetWheelCmd_SetDeceleration(char* incmd, int axis, int decel);
+
+int WheelCmdGatewayASCII(char* out, char* in);
 
 int strncpy_process(char* src, char* dst);
 

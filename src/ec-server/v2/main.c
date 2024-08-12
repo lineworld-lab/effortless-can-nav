@@ -87,14 +87,12 @@ pthread_t ECAT2_tid;
 
 int phase_toggle = 0;
 
+
+
+
 int main(int argc, char *argv[])
 
 {
-
-   printf("SOEM (Simple Open EtherCAT Master)\nServo controller\n");
-
-
-
 
    int config_result = InitRuntimeFrom("config.json");
 
