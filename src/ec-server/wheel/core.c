@@ -48,6 +48,9 @@ int InitWheelDaemon(char* can_dev_name, int can_node_id){
 
 void* CO_daemon_start(void* varg){
 
+    char* args = {"./canopend", CAN_DEV_NAME, "-i", CAN_NODE_ID_STR, "-c", SET_LOCAL_SOCKET, NULL};
+
+
     pid_t dpid = fork();
 
     if(dpid < 0){
@@ -62,9 +65,9 @@ void* CO_daemon_start(void* varg){
 
     if(dpid == 0){
 
-        char* args = {"./canopend", CAN_DEV_NAME, "-i", CAN_NODE_ID_STR, "-c", SET_LOCAL_SOCKET, NULL};
-
         execvp(args[0], args);
+
+        exit(EXIT_FAILURE);
 
     } else {
         
@@ -77,6 +80,10 @@ void* CO_daemon_start(void* varg){
         strcat(pid_log, "\n");
 
         fdebugLog(pid_log);
+
+        int status = 0;
+
+        waitpid(dpid, &status, 0);
 
     }
 
