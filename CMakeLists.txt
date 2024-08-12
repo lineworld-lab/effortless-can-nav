@@ -56,6 +56,7 @@ else()
 
   file(GLOB ecat_node_SRC
       "src/ec-server/v2/*.c"
+      "src/ec-server/wheel/*.c"
   )
 
 
