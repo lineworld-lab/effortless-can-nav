@@ -24,6 +24,7 @@
 #include <sys/socket.h>
 #include <sys/un.h>
 #include <signal.h>
+#include <sys/wait.h>
 
 
 #define MAX_CAN_DEV_NAME 10
