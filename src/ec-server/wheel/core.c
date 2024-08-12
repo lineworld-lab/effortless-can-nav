@@ -154,7 +154,7 @@ int WheelCmdSetUp(){
     char incmd[MAX_CAN_CMD_IN] = {0};
 
 
-    for(int i = 0; i < 4; i ++){
+    for(int i = 1; i < 5; i ++){
         // TODO:
         //   set rotation
 
@@ -191,17 +191,13 @@ int WheelCmdSetUp(){
 
 
 
-void GetWheelCmd_TargetVelocity(char* incmd, int axis, int speed){
+void GetWheelCmd_TargetVelocity(char* incmd, int axis, char* speed){
 
     char node_id[16] = {0};
 
-    char this_value[64] = {0};
+    sprintf(node_id, "%d", axis);
 
-    sprintf(node_id, axis);
-
-    sprintf(this_value, speed);
-
-    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_target_velocity.index, ecwheel_target_velocity.subindex, ecwheel_target_velocity.datatype, this_value);
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_target_velocity.index, ecwheel_target_velocity.subindex, ecwheel_target_velocity.datatype, speed);
 
 }
 
@@ -211,7 +207,7 @@ void GetWheelCmd_MotorEnable(char* incmd, int axis){
 
     char* this_value = "0x0F";
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_control_word.index, ecwheel_control_word.subindex, ecwheel_control_word.datatype, this_value);
 
@@ -223,7 +219,7 @@ void GetWheelCmd_MotorDisable(char* incmd, int axis){
 
     char* this_value = "0x06";
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_control_word.index, ecwheel_control_word.subindex, ecwheel_control_word.datatype, this_value);
 
@@ -235,7 +231,7 @@ void GetWheelCmd_ClearEncoderValue(char* incmd, int axis){
 
     char* this_value = "1";
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_actual_position_clear.index, ecwheel_actual_position_clear.subindex, ecwheel_actual_position_clear.datatype, this_value);
 
@@ -248,7 +244,7 @@ void GetWheelCmd_SetRotationClockwise(char* incmd, int axis){
 
     char* this_value = "1";
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_rotation_direction.index, ecwheel_rotation_direction.subindex, ecwheel_rotation_direction.datatype, this_value);
 
@@ -260,7 +256,7 @@ void GetWheelCmd_SetRotationCounterClockwise(char* incmd, int axis){
 
     char* this_value = "0";
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_rotation_direction.index, ecwheel_rotation_direction.subindex, ecwheel_rotation_direction.datatype, this_value);
 
@@ -273,9 +269,9 @@ void GetWheelCmd_SetAcceleration(char* incmd, int axis, int accel){
 
     char this_value[64] = {0};
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
-    sprintf(this_value, accel);
+    sprintf(this_value, "%d", accel);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_acceleration.index, ecwheel_acceleration.subindex, ecwheel_acceleration.datatype, this_value);
 
@@ -288,9 +284,9 @@ void GetWheelCmd_SetDeceleration(char* incmd, int axis, int decel){
 
     char this_value[64] = {0};
 
-    sprintf(node_id, axis);
+    sprintf(node_id, "%d", axis);
 
-    sprintf(this_value, decel);
+    sprintf(this_value, "%d", decel);
 
     sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_deceleration.index, ecwheel_deceleration.subindex, ecwheel_deceleration.datatype, this_value);
 
