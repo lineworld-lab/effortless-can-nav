@@ -258,13 +258,9 @@ int ProcessBuffer(char* res, char* req){
     
     } else if (strcmp(action, available_cmd[ECCMD_TRY_WHEEL_VELOCITY].cmd) == 0){ // tristate override
 
-        int speed = 0;
-
-        sscanf(params[0], "%d", &speed);
-
         char incmd[MAX_CAN_CMD_IN] = {0};
 
-        GetWheelCmd_TargetVelocity(incmd, axis, speed);
+        GetWheelCmd_TargetVelocity(incmd, axis, params[0]);
 
         status = WheelCmdGatewayASCII(res, incmd);
 
