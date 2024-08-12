@@ -6,6 +6,7 @@
 const AvailableCmd available_cmd[] = {
     { .cmd = "hc", .args1 = "[axis]", .args2 = "", .comment = "0 hc" },
     { .cmd = "tmo", .args1 = "[axis]", .args2 = "[angle]", .comment = "0 tmo 100000" },
+    { .cmd = "twv", .args1 = "[axis]", .args2 = "[speed]", .comment = "0 twv 50000" },
     { .cmd = "disconnect", .args1 = "", .args2 = "no arguments", .comment = "disconnect" },
     { .cmd = "discovery", .args1 = "", .args2 = "no argumnets", .comment = "discovery" }
 };

@@ -1,22 +1,32 @@
 #include "ec-server/wheel/core.h"
 
 
-pthread_t SOCK_PTID;
+pthread_t CAN_SOCK_PTID;
 
 
 FILE* TFP;
 
 char CAN_DEV_NAME[MAX_CAN_DEV_NAME] = {0};
 
-int CAN_NODE_ID; 
 
-char* CAN_NODE_ID_STR[MAX_CAN_NODE_NAME] = {0};
 
-int SOCKFD;
+char CAN_NODE_ID_STR[MAX_CAN_NODE_NAME] = {0};
+
+int CAN_SOCKFD;
 
 char SET_LOCAL_SOCKET[MAX_SET_LOCAL_SOCK] = {0};
 char LOCAL_SOCKET_NAME[MAX_SOCK_PATH] = {0};
 
+
+
+
+WheelCmdStruct ecwheel_control_word = { .index = "0x6040", .subindex = "0", .datatype = "i16"};
+WheelCmdStruct ecwheel_rotation_direction = {.index = "0x6410" , .subindex = "0x13", .datatype = "u8"};
+WheelCmdStruct ecwheel_actual_position = {.index = "0x6063", .subindex = "0", .datatype = "i32"};
+WheelCmdStruct ecwheel_actual_position_clear = {.index = "0x607C", .subindex = "2", .datatype = "u8"};
+WheelCmdStruct ecwheel_target_velocity = {.index = "0x60FF", .subindex = "0", .datatype = "i32"};
+WheelCmdStruct ecwheel_acceleration = {.index = "0x6083", .subindex = "0", .datatype = "u32"};
+WheelCmdStruct ecwheel_deceleration = {.index = "0x6084", .subindex = "0", .datatype = "u32"};
 
 
 int InitWheelDaemon(char* can_dev_name, int can_node_id){
@@ -37,7 +47,7 @@ int InitWheelDaemon(char* can_dev_name, int can_node_id){
     strcat(SET_LOCAL_SOCKET, LOCAL_SOCKET_NAME);
 
 
-    int ret = pthread_create(&SOCK_PTID, NULL, &CO_daemon_start, NULL); 
+    int ret = pthread_create(&CAN_SOCK_PTID, NULL, &CO_daemon_start, NULL); 
 
     fdebugLog("initiated");
 
@@ -96,8 +106,8 @@ int InitWheelCmdGateway(){
 
     int retry = 30;
 
-    SOCKFD = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (SOCKFD == -1) {
+    CAN_SOCKFD = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (CAN_SOCKFD == -1) {
         return -11;
     }
 
@@ -115,7 +125,7 @@ int InitWheelCmdGateway(){
     while(i < retry){
         
 
-        connection_result = connect(SOCKFD, (struct sockaddr *)&address, sizeof(address));
+        connection_result = connect(CAN_SOCKFD, (struct sockaddr *)&address, sizeof(address));
 
         if(connection_result == 0){
 
@@ -127,13 +137,169 @@ int InitWheelCmdGateway(){
         i++;
     }
 
+    WheelCmdSetUp();
+
     return connection_result;
 
 }
 
 
+int WheelCmdSetUp(){
 
-int WheelCmdGatewayASCII(char* in, char* out){
+    // TODO:
+    //   use config
+
+    char out[MAX_CAN_CMD_OUT] = {0};
+
+    char incmd[MAX_CAN_CMD_IN] = {0};
+
+
+    for(int i = 0; i < 4; i ++){
+        // TODO:
+        //   set rotation
+
+        GetWheelCmd_SetAcceleration(incmd, i, 100);
+
+        WheelCmdGatewayASCII(out, incmd);
+
+        printf("wheel: set accel: %s\n", out);
+
+        memset(out, 0, MAX_CAN_CMD_OUT);
+
+        GetWheelCmd_SetDeceleration(incmd, i, 100);
+
+        WheelCmdGatewayASCII(out, incmd);
+
+        printf("wheel: set decel: %s\n", out);
+
+        memset(out, 0, MAX_CAN_CMD_OUT);
+
+        GetWheelCmd_MotorEnable(incmd, i);
+
+        WheelCmdGatewayASCII(out, incmd);
+
+        printf("wheel: motor enable: %s\n", out);
+
+        memset(out, 0, MAX_CAN_CMD_OUT);
+
+
+    }
+
+    return 0;
+
+}
+
+
+
+void GetWheelCmd_TargetVelocity(char* incmd, int axis, int speed){
+
+    char node_id[16] = {0};
+
+    char this_value[64] = {0};
+
+    sprintf(node_id, axis);
+
+    sprintf(this_value, speed);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_target_velocity.index, ecwheel_target_velocity.subindex, ecwheel_target_velocity.datatype, this_value);
+
+}
+
+void GetWheelCmd_MotorEnable(char* incmd, int axis){
+
+    char node_id[16] = {0};
+
+    char* this_value = "0x0F";
+
+    sprintf(node_id, axis);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_control_word.index, ecwheel_control_word.subindex, ecwheel_control_word.datatype, this_value);
+
+}
+
+void GetWheelCmd_MotorDisable(char* incmd, int axis){
+
+    char node_id[16] = {0};
+
+    char* this_value = "0x06";
+
+    sprintf(node_id, axis);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_control_word.index, ecwheel_control_word.subindex, ecwheel_control_word.datatype, this_value);
+
+}
+
+void GetWheelCmd_ClearEncoderValue(char* incmd, int axis){
+
+    char node_id[16] = {0};
+
+    char* this_value = "1";
+
+    sprintf(node_id, axis);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_actual_position_clear.index, ecwheel_actual_position_clear.subindex, ecwheel_actual_position_clear.datatype, this_value);
+
+
+}
+
+void GetWheelCmd_SetRotationClockwise(char* incmd, int axis){
+
+    char node_id[16] = {0};
+
+    char* this_value = "1";
+
+    sprintf(node_id, axis);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_rotation_direction.index, ecwheel_rotation_direction.subindex, ecwheel_rotation_direction.datatype, this_value);
+
+
+}
+
+void GetWheelCmd_SetRotationCounterClockwise(char* incmd, int axis){
+    char node_id[16] = {0};
+
+    char* this_value = "0";
+
+    sprintf(node_id, axis);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_rotation_direction.index, ecwheel_rotation_direction.subindex, ecwheel_rotation_direction.datatype, this_value);
+
+}
+
+
+void GetWheelCmd_SetAcceleration(char* incmd, int axis, int accel){
+
+    char node_id[16] = {0};
+
+    char this_value[64] = {0};
+
+    sprintf(node_id, axis);
+
+    sprintf(this_value, accel);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_acceleration.index, ecwheel_acceleration.subindex, ecwheel_acceleration.datatype, this_value);
+
+}
+
+
+void GetWheelCmd_SetDeceleration(char* incmd, int axis, int decel){
+
+    char node_id[16] = {0};
+
+    char this_value[64] = {0};
+
+    sprintf(node_id, axis);
+
+    sprintf(this_value, decel);
+
+    sprintf(incmd, "%s w %s %s %s\n", node_id, ecwheel_deceleration.index, ecwheel_deceleration.subindex, ecwheel_deceleration.datatype, this_value);
+
+
+}
+
+
+
+int WheelCmdGatewayASCII(char* out, char* in){
 
 
     int ret;
@@ -142,13 +308,13 @@ int WheelCmdGatewayASCII(char* in, char* out){
 
     char ret_out[MAX_CAN_CMD_OUT] = {0};
 
-    if((ret = write(SOCKFD, in, MAX_CAN_CMD_IN)) < 0){
+    if((ret = write(CAN_SOCKFD, in, MAX_CAN_CMD_IN)) < 0){
 
         return -2;
 
     }
 
-    if ((ret = read(SOCKFD, ret_out, MAX_CAN_CMD_OUT)) < 0){
+    if ((ret = read(CAN_SOCKFD, ret_out, MAX_CAN_CMD_OUT)) < 0){
         return -1;
     }
     
@@ -162,6 +328,7 @@ int WheelCmdGatewayASCII(char* in, char* out){
 
     fdebugLog(out);
 
+    memset(in, 0 , MAX_CAN_CMD_IN);
 
     return ret;
 

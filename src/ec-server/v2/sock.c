@@ -1,5 +1,6 @@
 #include "ec-server/v2/ec_system.h"
 #include "ec-server/v2/sock.h"
+#include "ec-server/wheel/core.h"
 
 
 void* ECAT2_listen_and_serve(void* varg){
@@ -240,10 +241,11 @@ int ProcessBuffer(char* res, char* req){
 
     int status = 0;
 
-    if(strcmp(action,"hc") == 0){ // home check
+    if(strcmp(action,available_cmd[ECCMD_HOME_CHECK].cmd) == 0){ // home check
 
         status = GetHomingStatusByAxis(res, axis);
-    }else if (strcmp(action,"tmo") == 0){ // try move override
+
+    } else if (strcmp(action,available_cmd[ECCMD_TRY_MOVE_OVERRIDE].cmd) == 0){ // try move override
 
         int pos = 0;
 
@@ -254,7 +256,19 @@ int ProcessBuffer(char* res, char* req){
         status = PostPositionWithStatusFeedbackByAxis(res,  axis, pos);
     
     
-    } else if (strcmp(action,"DIEBRO") == 0){
+    } else if (strcmp(action, available_cmd[ECCMD_TRY_WHEEL_VELOCITY].cmd) == 0){ // tristate override
+
+        int speed = 0;
+
+        sscanf(params[0], "%d", &speed);
+
+        char incmd[MAX_CAN_CMD_IN] = {0};
+
+        GetWheelCmd_TargetVelocity(incmd, axis, speed);
+
+        status = WheelCmdGatewayASCII(res, incmd);
+
+    } else if (strcmp(action, available_cmd[ECCMD_DISCONNECT].cmd) == 0){
 
         printf("DIEBRO received\n");
 
@@ -263,9 +277,9 @@ int ProcessBuffer(char* res, char* req){
         status = 99;
 
 
-    } else if (strcmp(action, "discovery") == 0){
+    } else if (strcmp(action, available_cmd[ECCMD_DISCOVERY].cmd) == 0){
 
-      status = GetAvailableCommands(res);
+        status = GetAvailableCommands(res);
 
 
     }  else {
