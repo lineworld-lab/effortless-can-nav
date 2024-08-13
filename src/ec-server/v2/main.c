@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
    }
 
 
-   int wheel_result = InitWheelDaemon("can0", 77);
+   int wheel_result = InitWheelDaemon(CAN_DEV_NAME, CAN_NODE_ID_STR);
 
    wheel_result = InitWheelCmdGateway();
 

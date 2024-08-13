@@ -250,7 +250,9 @@ int ProcessBuffer(char* res, char* req){
 
         char incmd[MAX_CAN_CMD_IN] = {0};
 
-        GetWheelCmd_TargetVelocity(incmd, axis, params[0]);
+        int nid = g_wheels_node_ids[axis];
+
+        GetWheelCmd_TargetVelocity(incmd, nid, params[0]);
 
         status = WheelCmdGatewayASCII(res, incmd);
 

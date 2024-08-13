@@ -1,12 +1,13 @@
 #include "ec-server/v2/ec_system.h"
 #include "ec-server/v2/sock.h"
 #include "ec-server/v2/utils.h"
+#include "ec-server/wheel/core.h"
 
 
 const AvailableCmd available_cmd[] = {
     { .cmd = "hc", .args1 = "[axis]", .args2 = "", .comment = "0 hc" },
     { .cmd = "tmo", .args1 = "[axis]", .args2 = "[angle]", .comment = "0 tmo 100000" },
-    { .cmd = "twv", .args1 = "[axis]", .args2 = "[speed]", .comment = "0 twv 50000" },
+    { .cmd = "twv", .args1 = "[axis]", .args2 = "[speed]", .comment = "0 twv 0x8312" },
     { .cmd = "disconnect", .args1 = "", .args2 = "no arguments", .comment = "disconnect" },
     { .cmd = "discovery", .args1 = "", .args2 = "no argumnets", .comment = "discovery" }
 };
@@ -22,6 +23,8 @@ void ECAT2_sigint_handler(int signum)
 
 
    ECAT2_shutdown();
+
+   WheelShutdown();
 
    exit(signum);
 
@@ -671,9 +674,10 @@ void ECAT2_lifecycle(char *ifname)
 
       for(int motor = 0; motor < ec_slavecount; motor++){
 
+         if(debug_mode == 1){
 
-         // ECAT2_view();
-
+            ECAT2_view();
+         }
 
          control_stat = ECAT2_exchange(motor);
 
