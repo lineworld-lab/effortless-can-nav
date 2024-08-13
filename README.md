@@ -1,28 +1,154 @@
 1. Using ecsh 
+
+```shell
+
+########################
+#  ec-server/v2        #
+########################
+
+# help
 ./ecsh help
 
+
+# downloads and builds the external libraries SOEM, CANopenLinux, cJSON.
 ./ecsh vendor
-ㅁ Downloads and builds the external libraries SOEM and cJSON.
+
+
+# this will build the binaries needed to use this project
 
 ./ecsh build
-ㅁ The ecserver program is ready to run. You can use the ./ecsh run command to execute it.
 
-./ecsh vendor_rt: Installs the real-time library EtherCAT.
+# starts the server based on your config
+# see below [ 2. Config Modification ]
 
-./ecsh build_rt: Performs the real-time build.
+./ecsh server 
 
-./ecsh run: Executes the program.
-ㅁ The SOEM library is started, and this library functions as a master. The servo controller is initialized, and the home sensor information for each motor and the start offset values are displayed.
+# starts the command-line client to interact with the server
+# see below [ 3. Using Command-line client ]
+
+./ecsh client
+
+###########################
+# ec-server/v1 DEPRECATED #
+###########################
+
+# installs the real-time library IgH etherlab.
+
+./ecsh vendor_rt
+
+# builds based on IgH etherlab
+
+./ecsh build_rt
+
+```
+
 
 
 2. Config Modification
-If the name in if_name is incorrect, it should be corrected by checking the interface name using ifconfig or ip a.
-In drivers_num, verify whether it matches the actual number of connected slaves, and adjust the value if it differs.
-In homing_at_start, if there is no need to automatically move to the home position or if issues arise, change the value from 1 to 0 to disable the functionality.
+
+Sample configuration is ./config/config.json
+
+At this moment, configuration looks like below
+
+```json
+
+{
+
+    "drive": {
+
+        "drivers_num": 4,
+        "drivers":[
+    
+            {
+                "id": 0,
+                "homing_offset": 332000,
+                "start_offset":0
+            },
+            {
+                "id": 1,
+                "homing_offset": 300000,
+                "start_offset":0
+            },
+            {
+                "id": 2,
+                "homing_offset": 393000,
+                "start_offset":0
+            },
+            {
+                "id": 3,
+                "homing_offset": 139000,
+                "start_offset":0
+            }
+    
+        ],
+        "if_name": "enx00e04c3607cc",
+        "homing_margin_degrees":5,
+        "velocity_to_start_offset": 100000,
+        "move_fail_threshold":50,
+        "working_counter_fail_threshold": 20,
+        "error_count_threshold": 10,
+        "debug_mode": 0,
+        "homing_at_start": 0
+    },
+
+    "wheel":{
+        "wheels_num": 4,
+        "wheels":[
+    
+            {
+                "id": 1,
+                "rotation_clockwise": 1
+            },
+            {
+                "id": 2,
+                "rotation_clockwise": 0
+            },
+            {
+                "id": 3,
+                "rotation_clockwise": 1
+            },
+            {
+                "id": 4,
+                "rotation_clockwise": 0
+            }
+    
+        ],
+        "master_node_id": "77",
+        "if_name": "can0",
+        "local_socket_name": "/tmp/EC_wheel_sock",
+        "acceleration": 100,
+        "deceleration": 100
+    }
+
+    
+}
 
 
-3. Using ecctl
+```
 
-./ecctl -> connect IP PORT -> send -> axis tmo params
-By entering the command ./ecctl -> connect 192.168.50.177 9999 -> send -> axis tmo params, you can adjust the parameters of the desired wheel.
 
+3. Using Command-line client
+
+```shell
+
+# started by ./ecsh client
+# you will be prompted with something like below
+
+CMD: 
+
+# then, type this to connect to server
+
+CMD: $IP $PORT
+
+# $IP is your machine's ip
+# $PORT is 9999 by default
+
+# run below to get help
+
+CMD: help
+
+# run below to see what commands are available
+
+CMD: discovery
+
+```
