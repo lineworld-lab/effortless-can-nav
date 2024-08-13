@@ -70,8 +70,6 @@ extern int wheel_deceleration;
 int InitWheelDaemon(char* can_dev_name, char* can_node_id);
 
 
-
-
 int InitWheelCmdGateway();
 
 
