@@ -672,7 +672,7 @@ void ECAT2_lifecycle(char *ifname)
       for(int motor = 0; motor < ec_slavecount; motor++){
 
 
-         ECAT2_view();
+         // ECAT2_view();
 
 
          control_stat = ECAT2_exchange(motor);

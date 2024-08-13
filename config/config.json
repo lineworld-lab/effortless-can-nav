@@ -33,7 +33,7 @@
     "working_counter_fail_threshold": 20,
     "error_count_threshold": 10,
     "debug_mode": 0,
-    "homing_at_start": 1
+    "homing_at_start": 0
 
     
 }

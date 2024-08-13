@@ -43,6 +43,7 @@
 
 typedef struct WheelCmdStruct{
 
+    char seq[16];
     char index[16];
     char subindex[16];
     char datatype[16];
