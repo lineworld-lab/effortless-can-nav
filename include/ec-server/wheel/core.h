@@ -41,14 +41,8 @@
 
 #define MAX_SOCK_PATH 108
 
-typedef struct WheelCmdStruct{
+#define MAX_WHEELS_NUM 16
 
-    char seq[16];
-    char index[16];
-    char subindex[16];
-    char datatype[16];
-
-} WheelCmdStruct;
 
 
 extern pthread_t CAN_SOCK_PTID;
@@ -64,15 +58,14 @@ extern int CAN_SOCKFD;
 extern char SET_LOCAL_SOCKET[MAX_SET_LOCAL_SOCK];
 extern char LOCAL_SOCKET_NAME[MAX_SOCK_PATH];
 
-extern WheelCmdStruct ecwheel_control_word;
-extern WheelCmdStruct ecwheel_rotation_direction;
-extern WheelCmdStruct ecwheel_actual_position;
-extern WheelCmdStruct ecwheel_actual_position_clear;
-extern WheelCmdStruct ecwheel_target_velocity;
-extern WheelCmdStruct ecwheel_acceleration;
-extern WheelCmdStruct ecwheel_deceleration;
+extern int g_num_of_wheel_slaves;
+extern int* g_wheels_node_ids;
+extern int* node_rotation_direction; 
 
-int InitWheelDaemon(char* can_dev_name, int can_node_id);
+extern int wheel_acceleration;
+extern int wheel_deceleration;
+
+int InitWheelDaemon(char* can_dev_name, char* can_node_id);
 
 void* CO_daemon_start(void* varg);
 
@@ -103,9 +96,11 @@ void GetWheelCmd_SetDeceleration(char* incmd, int axis, int decel);
 
 int WheelCmdGatewayASCII(char* out, char* in);
 
+void WheelShutdown();
+
 int strncpy_process(char* src, char* dst);
 
-int get_overriding_socket(char* sock_target_name);
+int get_overriding_socket();
 
 void fdebugLog(char* msg);
 

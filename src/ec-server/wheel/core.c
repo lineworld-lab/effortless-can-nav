@@ -1,5 +1,6 @@
 #include "ec-server/wheel/core.h"
-
+#include "ec-server/wheel/object_dictionary.h"
+#include "ec-server/wheel/utils.h"
 
 pthread_t CAN_SOCK_PTID;
 
@@ -17,31 +18,24 @@ int CAN_SOCKFD;
 char SET_LOCAL_SOCKET[MAX_SET_LOCAL_SOCK] = {0};
 char LOCAL_SOCKET_NAME[MAX_SOCK_PATH] = {0};
 
+int g_num_of_wheel_slaves = 0;
+int* g_wheels_node_ids = NULL;
+int* node_rotation_direction = NULL;
+
+int wheel_acceleration = 0;
+int wheel_deceleration = 0;
 
 
 
-WheelCmdStruct ecwheel_control_word = { .seq = "101", .index = "0x6040", .subindex = "0", .datatype = "i16"};
-WheelCmdStruct ecwheel_rotation_direction = { .seq = "501", .index = "0x6410" , .subindex = "0x13", .datatype = "u8"};
-WheelCmdStruct ecwheel_actual_position = { .seq = "201", .index = "0x6063", .subindex = "0", .datatype = "i32"};
-WheelCmdStruct ecwheel_actual_position_clear = { .seq = "202", .index = "0x607C", .subindex = "2", .datatype = "u8"};
-WheelCmdStruct ecwheel_target_velocity = { .seq = "301", .index = "0x60FF", .subindex = "0", .datatype = "i32"};
-WheelCmdStruct ecwheel_acceleration = { .seq = "401", .index = "0x6083", .subindex = "0", .datatype = "u32"};
-WheelCmdStruct ecwheel_deceleration = { .seq = "402", .index = "0x6084", .subindex = "0", .datatype = "u32"};
+int InitWheelDaemon(char* can_dev_name, char* can_node_id){
 
 
-int InitWheelDaemon(char* can_dev_name, int can_node_id){
-
-
-    TFP = fopen("/tmp/CO_command_log", "a");
+    TFP = fopen("/tmp/EC_wheel_log", "a");
 
     fdebugLog("initiating...");
 
-
-    strncpy(CAN_DEV_NAME, can_dev_name, MAX_CAN_DEV_NAME);
-
-    sprintf(CAN_NODE_ID_STR, "%d", can_node_id);
  
-    get_overriding_socket(LOCAL_SOCKET_NAME);
+    get_overriding_socket();
     
     strcat(SET_LOCAL_SOCKET, "local-");
     strcat(SET_LOCAL_SOCKET, LOCAL_SOCKET_NAME);
@@ -146,19 +140,30 @@ int InitWheelCmdGateway(){
 
 int WheelCmdSetUp(){
 
-    // TODO:
-    //   use config
 
     char out[MAX_CAN_CMD_OUT] = {0};
 
     char incmd[MAX_CAN_CMD_IN] = {0};
 
 
-    for(int i = 1; i < 5; i ++){
-        // TODO:
-        //   set rotation
+    for(int i = 0; i < g_num_of_wheel_slaves; i ++){
+        
+        int nid = g_wheels_node_ids[i];
 
-        GetWheelCmd_SetAcceleration(incmd, i, 100);
+        int clockwise = node_rotation_direction[i];
+
+        if(clockwise == 1){
+
+            GetWheelCmd_SetRotationClockwise(incmd, nid);
+
+        } else {
+
+            GetWheelCmd_SetRotationCounterClockwise(incmd, nid);
+        }
+
+        WheelCmdGatewayASCII(out, incmd);
+
+        GetWheelCmd_SetAcceleration(incmd, nid, wheel_acceleration);
 
         WheelCmdGatewayASCII(out, incmd);
 
@@ -166,7 +171,7 @@ int WheelCmdSetUp(){
 
         memset(out, 0, MAX_CAN_CMD_OUT);
 
-        GetWheelCmd_SetDeceleration(incmd, i, 100);
+        GetWheelCmd_SetDeceleration(incmd, nid, wheel_deceleration);
 
         WheelCmdGatewayASCII(out, incmd);
 
@@ -174,7 +179,7 @@ int WheelCmdSetUp(){
 
         memset(out, 0, MAX_CAN_CMD_OUT);
 
-        GetWheelCmd_MotorEnable(incmd, i);
+        GetWheelCmd_MotorEnable(incmd, nid);
 
         WheelCmdGatewayASCII(out, incmd);
 
@@ -197,7 +202,13 @@ void GetWheelCmd_TargetVelocity(char* incmd, int axis, char* speed){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[101] %s w %s %s %s %s \n", node_id, ecwheel_target_velocity.index, ecwheel_target_velocity.subindex, ecwheel_target_velocity.datatype, speed);
+    sprintf(incmd, "[%s] %s w %s %s %s \n",
+        SEQ_TARGET_VELOCITY,
+        node_id, 
+        OD_TARGET_VELOCITY, 
+        DT_TARGET_VELOCITY, 
+        speed
+        );
 
 }
 
@@ -209,12 +220,11 @@ void GetWheelCmd_MotorEnable(char* incmd, int axis){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_control_word.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_CONTROL_WORD, 
         node_id, 
-        ecwheel_control_word.index, 
-        ecwheel_control_word.subindex, 
-        ecwheel_control_word.datatype, 
+        OD_CONTROL_WORD, 
+        DT_CONTROL_WORD, 
         this_value
         );
 
@@ -228,12 +238,11 @@ void GetWheelCmd_MotorDisable(char* incmd, int axis){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_control_word.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_CONTROL_WORD, 
         node_id, 
-        ecwheel_control_word.index, 
-        ecwheel_control_word.subindex, 
-        ecwheel_control_word.datatype, 
+        OD_CONTROL_WORD, 
+        DT_CONTROL_WORD, 
         this_value
         );
 
@@ -247,12 +256,11 @@ void GetWheelCmd_ClearEncoderValue(char* incmd, int axis){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_control_word.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_ACTUAL_POSITION_CLEAR, 
         node_id, 
-        ecwheel_actual_position_clear.index, 
-        ecwheel_actual_position_clear.subindex, 
-        ecwheel_actual_position_clear.datatype, 
+        OD_ACTUAL_POSITION_CLEAR, 
+        DT_ACTUAL_POSITION_CLEAR, 
         this_value
         );
 
@@ -267,12 +275,11 @@ void GetWheelCmd_SetRotationClockwise(char* incmd, int axis){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_rotation_direction.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_ROTATION_DIRECTION, 
         node_id, 
-        ecwheel_rotation_direction.index, 
-        ecwheel_rotation_direction.subindex, 
-        ecwheel_rotation_direction.datatype, 
+        OD_ROTATION_DIRECTION, 
+        DT_ROTATION_DIRECTION, 
         this_value
         );
 
@@ -286,12 +293,11 @@ void GetWheelCmd_SetRotationCounterClockwise(char* incmd, int axis){
 
     sprintf(node_id, "%d", axis);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_rotation_direction.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_ROTATION_DIRECTION, 
         node_id, 
-        ecwheel_rotation_direction.index, 
-        ecwheel_rotation_direction.subindex, 
-        ecwheel_rotation_direction.datatype, 
+        OD_ROTATION_DIRECTION, 
+        DT_ROTATION_DIRECTION, 
         this_value
         );
 
@@ -308,12 +314,11 @@ void GetWheelCmd_SetAcceleration(char* incmd, int axis, int accel){
 
     sprintf(this_value, "%d", accel);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_acceleration.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_ACCELERATION, 
         node_id, 
-        ecwheel_acceleration.index, 
-        ecwheel_acceleration.subindex, 
-        ecwheel_acceleration.datatype, 
+        OD_ACCELERATION, 
+        DT_ACCELERATION, 
         this_value
         );
 
@@ -330,12 +335,11 @@ void GetWheelCmd_SetDeceleration(char* incmd, int axis, int decel){
 
     sprintf(this_value, "%d", decel);
 
-    sprintf(incmd, "[%s] %s w %s %s %s %s \n", 
-        ecwheel_deceleration.seq, 
+    sprintf(incmd, "[%s] %s w %s %s %s \n", 
+        SEQ_DECELERATION, 
         node_id, 
-        ecwheel_deceleration.index, 
-        ecwheel_deceleration.subindex, 
-        ecwheel_deceleration.datatype, 
+        OD_DECELERATION, 
+        DT_DECELERATION, 
         this_value
         );
 
@@ -380,7 +384,29 @@ int WheelCmdGatewayASCII(char* out, char* in){
 }
 
 
+void WheelShutdown(){
 
+    char out[MAX_CAN_CMD_OUT] = {0};
+
+    char incmd[MAX_CAN_CMD_IN] = {0};
+
+    for(int i = 0; i < g_num_of_wheel_slaves; i++){
+
+        int nid = g_wheels_node_ids[i];
+
+        GetWheelCmd_MotorDisable(incmd, nid);
+
+        WheelCmdGatewayASCII(out, incmd);
+
+        memset(out, 0, MAX_CAN_CMD_OUT);
+
+    }
+
+
+    FreeWheelRuntime();
+
+
+}
 
 
 int strncpy_process(char* src, char* dst){
@@ -418,19 +444,17 @@ int strncpy_process(char* src, char* dst){
 
 
 
-int get_overriding_socket(char* sock_target_name){
+int get_overriding_socket(){
 
     char fname[MAX_SOCK_PATH] = {0};
 
-    strcat(fname, "/tmp/CO_command_socket");
+    strcat(fname, LOCAL_SOCKET_NAME);
 
     if (access(fname, F_OK) == 0) {
 
         unlink(fname);
     
     } 
-
-    strncpy(sock_target_name, fname, MAX_SOCK_PATH);
 
     return 0;
 

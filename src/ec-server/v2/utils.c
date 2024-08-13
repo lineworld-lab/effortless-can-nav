@@ -1,4 +1,5 @@
 #include "ec-server/v2/utils.h"
+#include "ec-server/wheel/utils.h"
 
 
 
@@ -57,9 +58,9 @@ int InitRuntimeFrom(char* filename){
 
 
 
-    cJSON *conf_json = cJSON_Parse(source);
+    cJSON *conf_json_root = cJSON_Parse(source);
 
-    if (conf_json == NULL){
+    if (conf_json_root == NULL){
 
 
         printf("error parsing config.json\n");
@@ -69,6 +70,8 @@ int InitRuntimeFrom(char* filename){
         return -4;
 
     }
+
+    cJSON *conf_json = cJSON_GetObjectItemCaseSensitive(conf_json_root, "drive");
 
     cJSON *drivers_num = cJSON_GetObjectItemCaseSensitive(conf_json, "drivers_num");
 
@@ -203,10 +206,17 @@ int InitRuntimeFrom(char* filename){
     }
 
 
-    free(source);
-
     printf("successfully initiated runtime from config json\n");
 
+    int wheel_init_result = InitWheelRuntimeFromObject(conf_json_root);
+
+    if(wheel_init_result < 0){
+
+        return -10;
+
+    }
+
+    free(source);
 
     return 0;
 }

@@ -1,39 +1,70 @@
 {
 
+    "drive": {
 
-    "drivers_num": 4,
-    "drivers":[
+        "drivers_num": 4,
+        "drivers":[
+    
+            {
+                "id": 0,
+                "homing_offset": 332000,
+                "start_offset":0
+            },
+            {
+                "id": 1,
+                "homing_offset": 300000,
+                "start_offset":0
+            },
+            {
+                "id": 2,
+                "homing_offset": 393000,
+                "start_offset":0
+            },
+            {
+                "id": 3,
+                "homing_offset": 139000,
+                "start_offset":0
+            }
+    
+        ],
+        "if_name": "enx00e04c3607cc",
+        "homing_margin_degrees":5,
+        "velocity_to_start_offset": 100000,
+        "move_fail_threshold":50,
+        "working_counter_fail_threshold": 20,
+        "error_count_threshold": 10,
+        "debug_mode": 0,
+        "homing_at_start": 0
+    },
 
-        {
-            "id": 0,
-            "homing_offset": 332000,
-            "start_offset":0
-        },
-        {
-            "id": 1,
-            "homing_offset": 300000,
-            "start_offset":0
-        },
-        {
-            "id": 2,
-            "homing_offset": 393000,
-            "start_offset":0
-        },
-        {
-            "id": 3,
-            "homing_offset": 139000,
-            "start_offset":0
-        }
-
-    ],
-    "if_name": "enx00e04c3607cc",
-    "homing_margin_degrees":5,
-    "velocity_to_start_offset": 100000,
-    "move_fail_threshold":50,
-    "working_counter_fail_threshold": 20,
-    "error_count_threshold": 10,
-    "debug_mode": 0,
-    "homing_at_start": 0
+    "wheel":{
+        "wheels_num": 4,
+        "wheels":[
+    
+            {
+                "id": 1,
+                "rotation_clockwise": 1
+            },
+            {
+                "id": 2,
+                "rotation_clockwise": 0
+            },
+            {
+                "id": 3,
+                "rotation_clockwise": 1
+            },
+            {
+                "id": 4,
+                "rotation_clockwise": 0
+            }
+    
+        ],
+        "master_node_id": "77",
+        "if_name": "can0",
+        "local_socket_name": "/tmp/EC_wheel_sock",
+        "acceleration": 100,
+        "deceleration": 100
+    }
 
     
 }
