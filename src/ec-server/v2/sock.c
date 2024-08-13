@@ -256,6 +256,47 @@ int ProcessBuffer(char* res, char* req){
 
         status = WheelCmdGatewayASCII(res, incmd);
 
+    } else if (strcmp(action, available_cmd[ECCMD_WHEEL_ROTATION].cmd) == 0){
+
+        char incmd[MAX_CAN_CMD_IN] = {0};
+
+        int nid = g_wheels_node_ids[axis];
+
+        int direction = 0;
+
+        sscanf(params[0], "%d", &direction);
+
+        int clockwise = node_rotation_direction[axis];
+
+        if(direction == 0){
+
+            if(clockwise == 1){
+
+                GetWheelCmd_SetRotationCounterClockwise(incmd, axis);
+
+            } else if (clockwise == 0) {
+                
+                GetWheelCmd_SetRotationClockwise(incmd, axis);
+
+            }
+
+        } else {
+
+            if(clockwise == 1){
+
+                GetWheelCmd_SetRotationClockwise(incmd, axis);
+
+            } else if (clockwise == 0) {
+                
+                GetWheelCmd_SetRotationCounterClockwise(incmd, axis);
+
+            }
+
+        }
+
+        status = WheelCmdGatewayASCII(res, incmd);
+
+
     } else if (strcmp(action, available_cmd[ECCMD_DISCONNECT].cmd) == 0){
 
         printf("DIEBRO received\n");

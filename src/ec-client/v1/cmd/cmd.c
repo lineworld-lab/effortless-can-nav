@@ -267,11 +267,11 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             break;
 
 
-        } else if (strcmp(new_buff, "swerve") == 0) {
+        } else if (strcmp(new_buff, "test") == 0) {
 
-            printf("SWERVE.\n");
+            printf("TEST.\n");
 
-            ret_code = ECCmdGatewayARSwerve(res);
+            ret_code = ECCmdGatewayARTest(res);
 
             break;
 

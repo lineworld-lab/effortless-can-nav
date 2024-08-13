@@ -264,7 +264,7 @@ int ECCmdGatewayAR(char* res, int ar_len, AxisReq* var){
 
 }
 
-int ECCmdGatewayARSwerve(char* res){
+int ECCmdGatewayARTest(char* res){
 
 
     AxisReq var[MAX_ARG_LEN];
@@ -459,6 +459,106 @@ int ECCmdGatewayARSwerve(char* res){
     var_count += 1;
 
     ret_code = ECCmdGatewayAR(res, var_count, var);
+
+
+    sleep(1);
+
+    var_count = 0;
+
+    memset(var, 0, sizeof(AxisReq) * MAX_ARG_LEN);
+
+    for(int i = 0 ; i < 4; i ++){
+
+        memset(&ar, 0, sizeof(AxisReq));
+
+        ar.axis = i;
+
+        strcpy(ar.action, "wro");
+
+        strcpy(ar.params, "0"); // backward
+
+        var[var_count] = ar;
+
+        var_count += 1;
+    }
+
+    ret_code = ECCmdGatewayAR(res, var_count, var);
+
+    sleep(1);
+
+    var_count = 0;
+
+    memset(var, 0, sizeof(AxisReq) * MAX_ARG_LEN);
+
+
+    for(int i = 0 ; i < 4; i ++){
+
+        memset(&ar, 0, sizeof(AxisReq));
+
+        ar.axis = i;
+
+        strcpy(ar.action, "twv");
+
+        strcpy(ar.params, "0x2BB0"); // 10rpm
+
+        var[var_count] = ar;
+
+        var_count += 1;
+    }
+
+
+    ret_code = ECCmdGatewayAR(res, var_count, var);
+
+    sleep(5);
+
+
+
+    var_count = 0;
+
+    memset(var, 0, sizeof(AxisReq) * MAX_ARG_LEN);
+
+
+    for(int i = 0 ; i < 4; i ++){
+
+        memset(&ar, 0, sizeof(AxisReq));
+
+        ar.axis = i;
+
+        strcpy(ar.action, "twv");
+
+        strcpy(ar.params, "0"); // 10rpm
+
+        var[var_count] = ar;
+
+        var_count += 1;
+    }
+
+
+    ret_code = ECCmdGatewayAR(res, var_count, var);
+
+    sleep(1);
+
+    var_count = 0;
+
+    memset(var, 0, sizeof(AxisReq) * MAX_ARG_LEN);
+
+    for(int i = 0 ; i < 4; i ++){
+
+        memset(&ar, 0, sizeof(AxisReq));
+
+        ar.axis = i;
+
+        strcpy(ar.action, "wro");
+
+        strcpy(ar.params, "1"); // frontward
+
+        var[var_count] = ar;
+
+        var_count += 1;
+    }
+
+    ret_code = ECCmdGatewayAR(res, var_count, var);
+
 
     return ret_code;
 
