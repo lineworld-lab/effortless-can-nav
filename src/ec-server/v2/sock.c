@@ -272,11 +272,11 @@ int ProcessBuffer(char* res, char* req){
 
             if(clockwise == 1){
 
-                GetWheelCmd_SetRotationCounterClockwise(incmd, axis);
+                GetWheelCmd_SetRotationCounterClockwise(incmd, nid);
 
             } else if (clockwise == 0) {
                 
-                GetWheelCmd_SetRotationClockwise(incmd, axis);
+                GetWheelCmd_SetRotationClockwise(incmd, nid);
 
             }
 
@@ -284,11 +284,11 @@ int ProcessBuffer(char* res, char* req){
 
             if(clockwise == 1){
 
-                GetWheelCmd_SetRotationClockwise(incmd, axis);
+                GetWheelCmd_SetRotationClockwise(incmd, nid);
 
             } else if (clockwise == 0) {
                 
-                GetWheelCmd_SetRotationCounterClockwise(incmd, axis);
+                GetWheelCmd_SetRotationCounterClockwise(incmd, nid);
 
             }
 
