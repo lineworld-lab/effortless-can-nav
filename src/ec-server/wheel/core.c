@@ -41,15 +41,10 @@ int InitWheelDaemon(char* can_dev_name, char* can_node_id){
     strcat(SET_LOCAL_SOCKET, LOCAL_SOCKET_NAME);
 
 
-    int ret = pthread_create(&CAN_SOCK_PTID, NULL, &CO_daemon_start, NULL); 
+    //int ret = pthread_create(&CAN_SOCK_PTID, NULL, &CO_daemon_start, NULL); 
 
-    fdebugLog("initiated");
+    pid_t ppid = getpid();
 
-    return ret;
-
-}
-
-void* CO_daemon_start(void* varg){
 
     char* args[] = {"./canopend", CAN_DEV_NAME, "-i", CAN_NODE_ID_STR, "-c", SET_LOCAL_SOCKET, NULL};
 
@@ -68,10 +63,12 @@ void* CO_daemon_start(void* varg){
 
     if(dpid == 0){
 
+        setsid();
+
+        signal(SIGINT, SIG_IGN);
+ 
         execvp(args[0], args);
-
-        exit(EXIT_FAILURE);
-
+    
     } else {
         
         sprintf(pid_dbg, "%d", dpid);
@@ -82,16 +79,26 @@ void* CO_daemon_start(void* varg){
 
         strcat(pid_log, "\n");
 
+        FILE* pidfile = fopen("co.pid", "w");
+
+        fputs(pid_dbg, pidfile);
+
+        fclose(pidfile);
+
         fdebugLog(pid_log);
 
-        int status = 0;
+        //int status = 0;
 
-        waitpid(dpid, &status, 0);
-
+        //waitpid(dpid, &status, 0);
     }
 
+    fdebugLog("initiated");
+
+    return 0;
 
 }
+
+
 
 
 int InitWheelCmdGateway(){
@@ -384,6 +391,7 @@ int WheelCmdGatewayASCII(char* out, char* in){
 }
 
 
+
 void WheelShutdown(){
 
     char out[MAX_CAN_CMD_OUT] = {0};
@@ -405,6 +413,18 @@ void WheelShutdown(){
 
     FreeWheelRuntime();
 
+
+    char pidstr[24] = {0};
+
+    FILE* pidfile = fopen("co.pid", "r");
+
+    fgets(pidstr, 24, pidfile);
+
+    int pidnum;
+
+    sscanf(pidstr, "%d", &pidnum);
+
+    kill(pidnum, SIGKILL);
 
 }
 

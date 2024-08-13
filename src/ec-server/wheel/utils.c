@@ -134,11 +134,11 @@ void FreeWheelRuntime(){
 
     do{
 
-        if(g_num_of_wheel_slaves == NULL){
+        if(g_wheels_node_ids == NULL){
             break;
         }
 
-        free(g_num_of_wheel_slaves);
+        free(g_wheels_node_ids);
 
     }while(0);
 

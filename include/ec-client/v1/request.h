@@ -52,6 +52,8 @@ int InitECCmdGatewayWithTimeout(char* res, char* addr, int port, long timeout);
 
 int ECCmdGatewayAR(char* res, int ar_len, AxisReq* var);
 
+int ECCmdGatewayARSwerve(char* res);
+
 int ECCmdGatewayLoadAR(char* res, int ar_len, AxisReq* var, int iteration, int distance, int interval);
 
 int TryECCmdGatewayARFeedback(char* res, int ar_len, AxisReq* var);

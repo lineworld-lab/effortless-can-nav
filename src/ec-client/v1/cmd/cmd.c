@@ -230,7 +230,7 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             printf("============\n");
 
         }
-         AxisReq ar;
+        AxisReq ar;
 
         memset(&ar, 0, sizeof(AxisReq));
 
@@ -267,7 +267,15 @@ int SendTo(char* res, int arg_len, char** runtime_args){
             break;
 
 
-        } 
+        } else if (strcmp(new_buff, "swerve") == 0) {
+
+            printf("SWERVE.\n");
+
+            ret_code = ECCmdGatewayARSwerve(res);
+
+            break;
+
+        }
 
 
         int idx = 0;

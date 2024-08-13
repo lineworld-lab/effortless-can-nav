@@ -25,6 +25,8 @@
 #include <sys/un.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <linux/prctl.h>
+#include <sys/prctl.h>
 
 
 #define MAX_CAN_DEV_NAME 10
@@ -67,7 +69,7 @@ extern int wheel_deceleration;
 
 int InitWheelDaemon(char* can_dev_name, char* can_node_id);
 
-void* CO_daemon_start(void* varg);
+
 
 
 int InitWheelCmdGateway();
