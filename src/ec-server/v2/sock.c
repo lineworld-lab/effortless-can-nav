@@ -22,6 +22,8 @@ int ListenAndServe(int port){
     socklen_t addrlen = sizeof(address);
 
     int running_stat = 0;
+
+    int client_type = 0;
  
     if ((server_fd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
         perror("socket failed");
