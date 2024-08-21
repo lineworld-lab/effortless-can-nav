@@ -1,3 +1,19 @@
+# effortless-can-nav
+
+life is too short for hassling over re-inventing CAN wheels (literally)
+
+
+## showcase
+
+
+This is the actual test drive on FASTECH Ezi-Servo-PR-60M-A and AMPS TECH L2DB-4830-CAFC
+
+
+[navigate.webm](https://github.com/user-attachments/assets/589b00a8-3f41-4ae4-917d-4f53a48ea034)
+
+
+## How to 
+
 1. Using ecsh 
 
 ```shell
