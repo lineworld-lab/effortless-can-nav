@@ -471,6 +471,9 @@ class SkeletonPanel(QWidget):
             elif key in self.speed_mode_buttons:
                 self.handle_speed_mode_button_press(key)
 
+    def update_wheel_angle_display(self, wheel_index, value):
+        self.wheel_value_labels[wheel_index].setText(str(value))
+
 
     # Handle angle control button presses (A, S, D keys)
     def handle_angle_button_press(self, key):
@@ -479,9 +482,15 @@ class SkeletonPanel(QWidget):
                 if btn_key == key:
                     btn.setStyleSheet("background-color: green;")
                     if key == 'A':
-                        self.rotate_wheels(-50000, -50000)
+                        angle = -50000
+                        self.rotate_wheels(angle, angle)
+                        self.update_wheel_angle_display(0, angle)
+                        self.update_wheel_angle_display(1, angle)
                     elif key == 'D':
-                        self.rotate_wheels(50000, 50000)
+                        angle = 50000
+                        self.rotate_wheels(angle, angle)
+                        self.update_wheel_angle_display(0, angle)
+                        self.update_wheel_angle_display(1, angle)
                     elif key == 'S':
                         self.reset_wheels()
                 else:
@@ -530,8 +539,6 @@ class SkeletonPanel(QWidget):
         angle_label, angle_value_label = self.wheel_labels[wheel_index]
         angle_value_label.setText(str(value))
 
-        self.update_speed_angle_frame()
-
         if self.is_auto:
             # Send command to move the actual robot wheel
             command = f"{wheel_index} {self.angle_change_cmd} {value}\n"
@@ -545,8 +552,6 @@ class SkeletonPanel(QWidget):
             if -200000 <= value <= 200000 and value % 50000 == 0:
                 self.wheel_labels[wheel_index][1].setText(str(value))
                 input_field.clear()
-
-                self.update_speed_angle_frame()
 
                 # Send command to move the actual robot wheel
                 command = f"{wheel_index} {self.angle_change_cmd} {value}\n"
@@ -573,31 +578,20 @@ class SkeletonPanel(QWidget):
     # Reset all wheels to the center position (0 degrees).
     def reset_wheels(self):
         self.rotate_wheels(0, 0)
-        self.log_message("Wheels reset to (0, 0)", add_newline=True)    
+        for i in range(4):
+            self.update_wheel_angle_display(i, 0)
+        self.log_message("Wheels reset to (0, 0)\n")  
 
-        # Update all wheel labels to 0
-        for angle_label, angle_value_label in self.wheel_labels:
-            angle_value_label.setText('0')
-        
-        # Update the speed/angle frame
-        self.update_speed_angle_frame()
 
     # Rotate the wheels to the specified angles.
     def rotate_wheels(self, angle0, angle1):
-        self.log_message(f"Sent command: 0 {self.angle_change_cmd} {angle0}")
-        self.log_message(f"Sent command: 1 {self.angle_change_cmd} {angle1}", add_newline=True)
-        # Update wheel labels
-        self.wheel_labels[0][1].setText(str(angle0))
-        self.wheel_labels[1][1].setText(str(angle1))
-    
-        # Update the speed/angle frame
-        self.update_speed_angle_frame()
+        commands = [
+            f"0 {self.angle_change_cmd} {angle0}\n",
+            f"1 {self.angle_change_cmd} {angle1}\n"
+        ]
+        for command in commands:
+            self.send_command(command)
 
-    # Update the speed and angle display frame with current wheel angles
-    def update_speed_angle_frame(self):
-        for i, (_, angle_value_label) in enumerate(self.wheel_labels):
-            current_angle = angle_value_label.text()
-            self.wheel_value_labels[i].setText(current_angle)
 
     # Toggle the direction of the robot between forward and backward.
     def toggle_direction(self):
@@ -605,12 +599,10 @@ class SkeletonPanel(QWidget):
         direction_text = "frontward" if self.direction_params == "1" else "backward"
         self.log_message(f"###################")
         self.log_message(f"#Direction Setting: {direction_text}#")
-        self.log_message(f"###################")
+        self.log_message(f"###################\n")
         for i in range(4):
             command = f"{i} {self.direction_change_cmd} {self.direction_params}"
-            self.log_message(f"Sent command: {command}")
             self.send_command(command)
-        self.log_message("", add_newline=True)
         self.update_direction_button_color()
 
 
@@ -633,9 +625,8 @@ class SkeletonPanel(QWidget):
         hex_speed = f"0x{self.current_speed:X}"
         for i in range(4):
             command = f"{i} {self.speed_change_cmd} {hex_speed}"
-            self.log_message(f"Sent command: {command}")
             self.send_command(command)
-        self.log_message(f"Speed set to: {hex_speed} ({rpm} RPM)\n", add_newline=True)
+        self.log_message(f"Speed set to: {hex_speed} ({rpm} RPM)\n")
 
 
     # Change the speed of all wheels by the specified delta.
@@ -684,7 +675,8 @@ class SkeletonPanel(QWidget):
                 data = self.socket.recv(1024)
                 if not data:
                     break
-               
+                message = data.decode()
+                self.signals.receivedData.emit(message)
             except Exception as e:
                 self.log_message(f"Error receiving data: {e}")
                 break
@@ -698,6 +690,9 @@ class SkeletonPanel(QWidget):
                 if not command.endswith('\n'):
                     command += '\n'
                 self.socket.sendall(command.encode('utf-8'))
+                print(f"Sent command: {command.strip()}")
+                
+                self.log_message(f"Sent command: {command.strip()}")
             except Exception as e:
                 print(f"Failed to send command: {e}")
                 self.log_message(f"Failed to send command: {e}")
@@ -707,14 +702,23 @@ class SkeletonPanel(QWidget):
 
     
     # Log messages to the UI for user feedback
-    def log_message(self, message, add_newline=False):
-        self.message_display.append(message)
-        if add_newline:
-            self.message_display.append("")
-        self.message_display.verticalScrollBar().setValue(
-            self.message_display.verticalScrollBar().maximum()
-        )
-        QApplication.processEvents()
+    def log_message(self, message):
+        
+        filtered_phrases = [
+            "Sent command:",
+            "Wheels reset to",
+            "Speed set to:",
+            "Direction Setting:",
+            "#"
+        ]
+        
+        
+        if any(phrase in message for phrase in filtered_phrases):
+            self.message_display.append(message)
+            self.message_display.verticalScrollBar().setValue(
+                self.message_display.verticalScrollBar().maximum()
+            )
+            QApplication.processEvents()
 
 # Main execution
 if __name__ == '__main__':
