@@ -88,6 +88,15 @@ int RunInteractive(){
             
             } else {
                 printf("connect success\n");
+
+                int client_type = 1;
+                ssize_t sent = send(SOCK_FD, &client_type, sizeof(int), 0);
+                if(send == sizeof(int)) {
+                    printf("Sent client type: 1\n");
+                } else {
+                    printf("Failed to send client type\n");
+                }
+                
             }
 
             printf("%s\n", res);
