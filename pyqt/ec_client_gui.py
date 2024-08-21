@@ -1,52 +1,211 @@
+# -*- coding: utf-8 -*-
+
 import sys
 import os
 import socket
 import threading
-from PyQt5.QtWidgets import QApplication, QWidget, QGridLayout, QVBoxLayout, QLabel, QPushButton, QDial, QLineEdit, QGraphicsView, QGraphicsScene, QFrame, QDialog, QTextEdit
+from PyQt5.QtWidgets import (QApplication, QWidget, QGridLayout, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, 
+                             QDial, QLineEdit, QTextEdit, QMessageBox, QGraphicsView, QGraphicsScene, QFrame, QDialog, 
+                             QTextEdit, QMessageBox, QDesktopWidget)
 from PyQt5.QtCore import Qt, QSize, pyqtSignal, QObject
 from PyQt5.QtGui import QIcon, QPixmap
 
-class ConnectionDialog(QDialog):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.initUI()
+# Function to center a window on the screen
+def center_window(window):
+    screen = QDesktopWidget().screenNumber(QDesktopWidget().cursor().pos())
+    center_point = QDesktopWidget().screenGeometry(screen).center()
+    frame_geometry = window.frameGeometry()
+    frame_geometry.moveCenter(center_point)
+    window.move(frame_geometry.topLeft())
 
-    def initUI(self):
-        self.setWindowTitle("Connection")
-        layout = QVBoxLayout()
-
-        self.ip_input = QLineEdit(self)
-        self.ip_input.setPlaceholderText("IP Address")
-        layout.addWidget(self.ip_input)
-
-        self.port_input = QLineEdit(self)
-        self.port_input.setPlaceholderText("Port")
-        layout.addWidget(self.port_input)
-
-        connect_button = QPushButton("Connect", self)
-        connect_button.clicked.connect(self.accept)
-        layout.addWidget(connect_button)
-
-        self.setLayout(layout)
-
-    def get_connection_info(self):
-        return self.ip_input.text(), self.port_input.text()
-
+# Custom signal class for socket communication
 class SocketSignals(QObject):
     receivedData = pyqtSignal(str)
 
-class SkeletonPanel(QWidget):
+
+#***********************************************    Login Window    **********************************************************# 
+# Login window class
+class LoginWindow(QWidget):
     def __init__(self):
         super().__init__()
-        self.is_auto = False
         self.initUI()
-        self.socket = None
-        self.signals = SocketSignals()
-        
+        center_window(self)  
 
     def initUI(self):
-        self.setWindowTitle('Skeleton Panel')
-        self.setGeometry(100, 100, 1200, 800)
+        self.setWindowTitle('Login')
+        self.setGeometry(300, 300, 400, 250)  # Set window size
+
+        layout = QVBoxLayout()
+
+        # IP input field
+        self.ip_input = QLineEdit(self)
+        self.ip_input.setPlaceholderText("IP Address")
+        self.ip_input.setStyleSheet("font-size: 14px; padding: 5px;")
+        layout.addWidget(self.ip_input)
+
+        # Port input field
+        self.port_input = QLineEdit(self)
+        self.port_input.setPlaceholderText("Port")
+        self.port_input.setStyleSheet("font-size: 14px; padding: 5px;")
+        layout.addWidget(self.port_input)
+
+        # Connect button
+        self.connect_button = QPushButton('Connect', self)
+        self.connect_button.clicked.connect(self.try_connect)
+        self.connect_button.setStyleSheet("font-size: 14px; padding: 10px;")
+        layout.addWidget(self.connect_button)
+
+        # Help button
+        self.help_button = QPushButton('Help', self)
+        self.help_button.clicked.connect(self.show_help)
+        self.help_button.setStyleSheet("font-size: 14px; padding: 10px;")
+        layout.addWidget(self.help_button)
+
+        self.setLayout(layout)
+
+    def show_help(self):
+        self.help_window = HelpWindow()
+        self.help_window.show()
+
+    #connect to IP and PORT address 
+    def try_connect(self):
+        ip = self.ip_input.text()
+        port = self.port_input.text()
+
+        # Check for admin mode
+        if ip == "9999" and port == "9999":
+            QMessageBox.information(self, "Admin Mode", "Entering admin mode without server connection.")
+            self.accept(None)
+            return
+
+        try:
+            port = int(port)
+            socket_obj = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            socket_obj.connect((ip, port))
+
+            client_type = 0
+            socket_obj.sendall(client_type.to_bytes(4, byteorder='little'))
+
+            QMessageBox.information(self, "Success", "Connection successful!")
+            self.accept(socket_obj)
+        except Exception as e:
+            QMessageBox.warning(self, "Error", f"Connection failed: {str(e)}")
+
+    # open main window
+    def accept(self, socket_obj):
+        self.hide()
+        self.main_window = SkeletonPanel(socket_obj)
+        self.main_window.show()
+
+
+#***********************************************    help window    **********************************************************************#
+
+class HelpWindow(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.initUI()
+        center_window(self)
+
+    def initUI(self):
+        self.setWindowTitle('Help')
+        self.setGeometry(300, 300, 500, 400)
+
+        layout = QVBoxLayout()
+
+        help_text = QTextEdit()
+        help_text.setReadOnly(True)
+        help_text.setHtml("""
+        <h1>Robot Controller Help</h1>
+        <p>This program allows you to control a robot remotely. Here's how to use it:</p>
+        <ol>
+            <li><h3>Login:</h3> Enter the IP address and port of the robot server, then click 'Connect'.</li>
+            (You can log in in admin mode by entering <strong>9999</strong> in the ip address and port address.)
+            <br>
+            <li><h3>Main Interface:</h3> Once connected, you'll see the main control panel.</li>
+            <br>
+            <li><h3>Angle Control:</h3> Turn the dial to adjust the angle of the robot wheel.</li>
+            <br>
+            <strong>(Auto mode)</strong> The angle of the robot's wheels changes immediately.
+            <br>
+            <strong>(Non-Auto mode)</strong> If it is not in automatic mode, you must adjust the dial and click the <strong>send all wheel angle</strong> button to change the angle.
+            (increasing or decreasing by <strong>45degrees</strong>)
+            <br>              
+            <li><h3>Speed Control:</h3> Use the acceleration or deceleration buttons to move the robot.</li>
+            (Default speed is <strong>10 rpm</strong>, increasing or decreasing by <strong>10 rpm</strong>)
+            <br>
+
+
+            <li><h3>Auto Mode:</h3> Toggle auto mode to control the robot with a keyboard </li>
+            <br>
+                          
+            
+            <li><h3>Keyboard controls</h3></li>
+                <br><br>
+            <strong>Angle Settings</strong>
+                <br><br>
+            <strong>A</strong>: Turn left (from 0 to -45 degrees (-50000) set)
+                <br>
+            <strong>S</strong>: Straight (set 0 degree (0))
+                <br>    
+            <strong>D</strong>: Turn right (from 0 to 45 degrees (50000)
+                <br><br>
+            <strong>Speed setting</strong>
+                <br><br>
+            <strong>J</strong>: deceleration (decelerates to the default speed of all wheels by 10 rpm)
+                <br>
+            <strong>K</strong>: stop (set the speed of all wheels to 0)
+                <br>
+            <strong>L</strong>: acceleration (the default speed of all wheels is 10 rpm)
+                <br><br>
+
+            <strong>Moving forward, backward</strong>
+                <br><br>
+            <strong>M</strong>: Change the rotation direction of the wheel to select forward or backward</li>
+                <br>
+            <li><h3>Message Display:</h3> View system messages and command logs in the message area.</li>
+        </ol>
+        <h2>Made in Line World</h2>
+        """)
+        layout.addWidget(help_text)
+
+        close_button = QPushButton('Close', self)
+        close_button.clicked.connect(self.close)
+        layout.addWidget(close_button)
+
+        self.setLayout(layout)
+
+
+#***********************************************    Main application window    **********************************************************#
+# Main application window class
+class SkeletonPanel(QWidget):
+
+    # Initialize the main application window
+    # socket_obj: Socket object for communication with the server
+    def __init__(self, socket_obj=None):
+        super().__init__()
+        self.socket = socket_obj
+        self.is_auto = False
+        self.current_speed = 0
+        self.angle_change_cmd = "tmo"
+        self.speed_change_cmd = "twv"
+        self.direction_change_cmd = "wro"
+        self.direction_params = "1"
+        self.speed_increment = 0x2BB0 # 10RPM (DEC = RPM * 512 * 4096 / 1875)
+        self.initUI()
+        center_window(self)
+        self.signals = SocketSignals()
+        self.signals.receivedData.connect(self.log_message)
+        if self.socket:
+            threading.Thread(target=self.receive_data, daemon=True).start()
+        self.update_direction_button_color()  # Initialize M button color
+
+    # Set up the main user interface
+    # This includes creating frames for camera view, speed/angle display, and controls
+    def initUI(self):
+        self.window_width = 1200
+        self.window_height = 800
+        self.setGeometry(100, 100, self.window_width, self.window_height)
+        self.setWindowTitle('Robot Controller')
 
         # Set background image
         self.image_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc/background.jpg'))
@@ -54,40 +213,61 @@ class SkeletonPanel(QWidget):
         self.scene = QGraphicsScene()
         self.background.setScene(self.scene)
         self.background.setStyleSheet("background: transparent; border: none;")
-        self.background.setGeometry(0, 0, 1200, 800)
-        self.bg_image = QPixmap(self.image_path).scaled(1200, 800, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
+        self.background.setGeometry(0, 0, self.window_width, self.window_height)
+        self.bg_image = QPixmap(self.image_path).scaled(self.window_width, self.window_height, Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
         self.scene.addPixmap(self.bg_image)
 
         # Main layout
         layout = QGridLayout()
         self.setLayout(layout)
 
-        # Frame for Robot Camera View
-        camera_frame = QFrame(self)
-        camera_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
-        camera_frame.setLineWidth(2)
-        camera_layout = QGridLayout(camera_frame)
+        # Create and add frames
+        self.create_message_frame(layout)
+        self.create_speed_angle_frame(layout)
+        self.create_right_frame(layout)
 
+        # Set layout properties
+        layout.setRowStretch(0, 4)  
+        layout.setRowStretch(1, 4)
+        layout.setRowStretch(2, 1)
+        layout.setColumnStretch(0, 1)
+        layout.setColumnStretch(1, 1)
+
+        self.show()
+
+
+    # code for creating message frame
+    def create_message_frame(self, layout):
+        # Frame for message
+        self.camera_frame = QFrame(self)
+        self.camera_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
+        self.camera_frame.setLineWidth(2)
+        self.camera_frame.setMinimumSize(int(self.window_width * 0.45), int(self.window_height * 0.45))
+        camera_layout = QVBoxLayout(self.camera_frame)
+
+        screen_label = QLabel('Message', self)
+        screen_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        screen_label.setStyleSheet("border: 2px solid black; color: black; font-weight: bold;")
+        camera_layout.addWidget(screen_label)
+
+        self.message_display = QTextEdit(self)
+        self.message_display.setReadOnly(True)
+        self.message_display.setMinimumSize(int(self.window_width * 0.4), int(self.window_height * 0.4))
+        camera_layout.addWidget(self.message_display)
+
+        layout.addWidget(self.camera_frame, 0, 0, 2, 1)
+
+
+    # Create and set up the frame for displaying speed and wheel angles
+    def create_speed_angle_frame(self, layout):
         # Frame for Speed/Angle display
         speed_angle_frame = QFrame(self)
         speed_angle_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
         speed_angle_frame.setLineWidth(2)
         speed_angle_layout = QGridLayout(speed_angle_frame)
 
-        # Frame for Wheel controls (right side)
-        right_frame = QFrame(self)
-        right_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
-        right_frame.setLineWidth(2)
-        right_layout = QGridLayout(right_frame)
-
-        # Robot Camera View Label
-        screen_label = QLabel('Robot Camera View', self)
-        screen_label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        screen_label.setStyleSheet("border: 2px solid black; color: black; font-weight: bold;")
-        camera_layout.addWidget(screen_label, 0, 0, 1, 2)
-
         # Speed display label
-        self.speed_label = QLabel('Speed: 0', self)
+        self.speed_label = QLabel('Speed: 0 (0 RPM)', self)
         self.speed_label.setAlignment(Qt.AlignCenter)
         self.speed_label.setStyleSheet("color: black; font-weight: bold; font-size: 24px;")
         speed_angle_layout.addWidget(self.speed_label, 0, 0, 1, 2)
@@ -96,7 +276,7 @@ class SkeletonPanel(QWidget):
         self.wheel_labels = []
         self.wheel_value_labels = []
         for i in range(1, 5):
-            angle_label = QLabel(f'Wheel {i} Angle:', self)
+            angle_label = QLabel(f'Wheel {i-1} Angle:', self)
             angle_label.setAlignment(Qt.AlignCenter)
             angle_label.setStyleSheet("color: black; font-weight: bold; font-size: 24px;")
 
@@ -108,151 +288,104 @@ class SkeletonPanel(QWidget):
             vbox.addWidget(angle_label)
             vbox.addWidget(angle_value_label)
 
-            if i % 2 == 1:
-                row = 1 + (i - 1) // 2
-                col = 0
-            else:
-                row = 1 + (i - 1) // 2
-                col = 1
+            row = 1 + (i - 1) // 2
+            col = (i - 1) % 2
             speed_angle_layout.addLayout(vbox, row, col)
 
             self.wheel_labels.append((angle_label, angle_value_label))
             self.wheel_value_labels.append(angle_value_label)
 
-        # Wheel controls
-        self.add_wheel_control(right_layout, 1, 0, 0, include_speed_buttons=False)  
-        self.add_wheel_control(right_layout, 1, 1, 1, include_speed_buttons=False)  
-        self.add_wheel_control(right_layout, 2, 0, 2, include_speed_buttons=False)  
-        self.add_wheel_control(right_layout, 2, 1, 3, include_speed_buttons=False)  
+        layout.addWidget(speed_angle_frame, 2, 0)
 
-        # Start and Stop buttons
+
+    # Create and set up the frame for displaying speed and wheel angles
+    def create_right_frame(self, layout):
+        right_frame = QFrame(self)
+        right_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
+        right_frame.setLineWidth(2)
+        right_layout = QGridLayout(right_frame)
+
+        # Add control buttons
+        self.add_control_buttons(right_layout)
+
+        # Add speed control (now below Start and Stop buttons)
+        self.add_speed_control(right_layout)
+
+        # Add wheel controls
+        wheel_layout = QGridLayout()
+        for i in range(4):
+            self.add_wheel_control(wheel_layout, i // 2, i % 2, i)
+        right_layout.addLayout(wheel_layout, 2, 0, 1, 4)
+
+        # Add keyboard control section
+        self.add_keyboard_control(right_layout)
+
+        layout.addWidget(right_frame, 0, 1, 3, 1)
+
+
+    # Add control buttons (Start, Stop, Auto, Send All Wheel Angle)
+    def add_control_buttons(self, layout):
         start_button = QPushButton('Start', self)
         stop_button = QPushButton('Stop', self)
+        self.auto_button = QPushButton("Auto", self)
+        self.send_button = QPushButton("Send All Wheel Angle", self)
 
-        # Set button size (width x height)
-        start_button.setFixedSize(100, 50) 
+        start_button.setFixedSize(100, 50)
         stop_button.setFixedSize(100, 50)
+        self.auto_button.setFixedSize(100, 50)
+        self.send_button.setFixedSize(200, 50)
 
         start_button.clicked.connect(self.start_robot)
         stop_button.clicked.connect(self.stop_robot)
+        self.auto_button.clicked.connect(self.toggle_auto)
+        self.send_button.clicked.connect(self.send_all_wheel_positions)
 
-        right_layout.addWidget(start_button, 0, 0, 1, 1)
-        right_layout.addWidget(stop_button, 0, 1, 1, 1)
+        self.auto_button.setStyleSheet("background-color: red;")
 
-        # Speed control buttons and input field
-        button_layout = QGridLayout()
-        button_layout.setSpacing(0)
-        button_layout.setContentsMargins(0, 0, 0, 0)
+        layout.addWidget(start_button, 0, 0, 1, 1)
+        layout.addWidget(stop_button, 0, 1, 1, 1)
+        layout.addWidget(self.auto_button, 0, 2, 1, 1)
+        layout.addWidget(self.send_button, 0, 3, 1, 1)
 
-        increase_speed_button = QPushButton(self)
-        decrease_speed_button = QPushButton(self)
 
-        # Set icons for speed control buttons
-        increase_icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc/increase.PNG'))
-        decrease_icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc/decrease.PNG'))
+    # Add speed control elements (increase/decrease buttons and input field)
+    def add_speed_control(self, layout):
+        speed_layout = QHBoxLayout()
+
+        acceleration_button = QPushButton(self)
+        deceleration_button = QPushButton(self)
+
+        acceleration_icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc/increase.PNG'))
+        deceleration_icon_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'doc/decrease.PNG'))
         
-        increase_speed_button.setIcon(QIcon(increase_icon_path))
-        decrease_speed_button.setIcon(QIcon(decrease_icon_path))
+        acceleration_button.setIcon(QIcon(acceleration_icon_path))
+        deceleration_button.setIcon(QIcon(deceleration_icon_path))
 
-        # Configure button size and style
-        icon_size = QSize(50, 50)
-        increase_speed_button.setIconSize(icon_size)
-        decrease_speed_button.setIconSize(icon_size)
-        increase_speed_button.setFixedSize(50, 50)
-        increase_speed_button.setStyleSheet("border: none; margin: 0px; padding: 0px;")
-        decrease_speed_button.setFixedSize(50, 50)
-        decrease_speed_button.setStyleSheet("border: none; margin: 0px; padding: 0px;")
+        icon_size = QSize(40, 40)
+        acceleration_button.setIconSize(icon_size)
+        deceleration_button.setIconSize(icon_size)
+        acceleration_button.setFixedSize(40, 40)
+        deceleration_button.setFixedSize(40, 40)
 
-        # Input field for speed value
         speed_input = QLineEdit(self)
-        speed_input.setFixedSize(120, 30)
-        speed_input.setStyleSheet("font-size: 16px;")
+        speed_input.setFixedSize(100, 30)
+        speed_input.setStyleSheet("font-size: 14px;")
         speed_input.setAlignment(Qt.AlignCenter)
         speed_input.setPlaceholderText("Speed")
         speed_input.returnPressed.connect(lambda: self.set_speed(speed_input))
 
-        # Link buttons to speed control
-        increase_speed_button.clicked.connect(lambda: self.change_all_wheel_speeds(500000))
-        decrease_speed_button.clicked.connect(lambda: self.change_all_wheel_speeds(-500000))
+        acceleration_button.clicked.connect(lambda: self.change_all_wheel_speeds(self.speed_increment))
+        deceleration_button.clicked.connect(lambda: self.change_all_wheel_speeds(-self.speed_increment))
 
-        button_layout.addWidget(increase_speed_button, 0, 0)
-        button_layout.addWidget(decrease_speed_button, 0, 1)
-        button_layout.addWidget(speed_input, 0, 2)
+        speed_layout.addWidget(acceleration_button)
+        speed_layout.addWidget(deceleration_button)
+        speed_layout.addWidget(speed_input)
 
-        right_layout.addLayout(button_layout, 3, 0, 1, 2)
-
-        # Connection button
-        self.connect_button = QPushButton("Connection", self)
-        self.connect_button.clicked.connect(self.show_connection_dialog)
-        self.connect_button.setFixedHeight(50)
-        right_layout.addWidget(self.connect_button, 4, 0, 1, 2)
-        
-        # Add Auto button
-        self.auto_button = QPushButton("Auto", self)
-        self.auto_button.clicked.connect(self.toggle_auto)
-        self.auto_button.setStyleSheet("background-color: red;")
-        self.auto_button.setFixedHeight(50)
-        right_layout.addWidget(self.auto_button, 5, 0, 1, 1)
-
-        # Add Send All Wheel Positions button
-        self.send_button = QPushButton("Send All Wheel Angle", self)
-        self.send_button.clicked.connect(self.send_all_wheel_positions)
-        self.send_button.setFixedSize(200, 50)
-        right_layout.addWidget(self.send_button, 5, 1, 1, 1)
-
-        # Add frames to the main layout
-        layout.addWidget(camera_frame, 0, 0)
-        layout.addWidget(speed_angle_frame, 1, 0)
-        layout.addWidget(right_frame, 0, 1, 3, 1)
-        layout.setRowStretch(0, 2)  
-        layout.setRowStretch(1, 1)
-        
+        layout.addLayout(speed_layout, 1, 0, 1, 4)
 
 
-        self.show()
-
-    def show_connection_dialog(self):
-        dialog = ConnectionDialog(self)
-        if dialog.exec_():
-            ip, port = dialog.get_connection_info()
-            self.connect_to_server(ip, port)
-
-    def connect_to_server(self, ip, port):
-        try:
-            port = int(port)
-            self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.socket.connect((ip, port))
-            print(f"Connected to {ip}:{port}")
-            self.connect_button.setText("Connected")
-            self.connect_button.setEnabled(False)
-            threading.Thread(target=self.receive_data, daemon=True).start()
-        except Exception as e:
-            print(f"Connection failed: {e}")
-
-    def receive_data(self):
-        while True:
-            try:
-                data = self.socket.recv(1024)
-                if not data:
-                    break
-                message = data.decode()
-                self.signals.receivedData.emit(message)
-            except:
-                break
-        print("Disconnected from server")
-
-
-    def send_command(self, command):
-        if self.socket:
-            try:
-                self.socket.sendall(command.encode())
-                print(f"Sent command: {command}")
-            except:
-                print("Failed to send command")
-        else:
-            print("Not connected to server")
-
-    def add_wheel_control(self, layout, row, col, wheel_index, include_speed_buttons=True):
+    # Add control elements for individual wheels (dial and input field) 
+    def add_wheel_control(self, layout, row, col, wheel_index):
         dial = QDial(self)
         dial.setNotchesVisible(True)
         dial.setWrapping(False)  # Disable 360-degree rotation
@@ -280,22 +413,132 @@ class SkeletonPanel(QWidget):
         # Add the wheel control layout to the specified position in the main layout
         layout.addLayout(wheel_layout, row, col, Qt.AlignCenter)
 
+
+    # Add keyboard control section with buttons for angle and speed/mode control
+    def add_keyboard_control(self, layout):
+        keyboard_frame = QFrame(self)
+        keyboard_frame.setFrameStyle(QFrame.Box | QFrame.Plain)
+        keyboard_layout = QHBoxLayout(keyboard_frame)
+
+        # Angle Control
+        angle_control = QVBoxLayout()
+        angle_label = QLabel("Angle Control")
+        angle_label.setAlignment(Qt.AlignCenter)
+        angle_label.setStyleSheet("font-weight: bold;")
+        angle_control.addWidget(angle_label)
+
+        angle_buttons = QHBoxLayout()
+        self.angle_buttons = {}
+        for key in ['A', 'S', 'D']:
+            btn = QPushButton(key)
+            btn.setFixedSize(40, 40)  # Reduced button size
+            angle_buttons.addWidget(btn)
+            self.angle_buttons[key] = btn
+        angle_control.addLayout(angle_buttons)
+
+        # Speed and Mode Control
+        speed_mode_control = QVBoxLayout()
+        speed_mode_label = QLabel("Speed and Mode Control")
+        speed_mode_label.setAlignment(Qt.AlignCenter)
+        speed_mode_label.setStyleSheet("font-weight: bold;")
+        speed_mode_control.addWidget(speed_mode_label)
+
+        speed_mode_buttons = QHBoxLayout()
+        self.speed_mode_buttons = {}
+        for key in ['M', 'J', 'K', 'L']:
+            btn = QPushButton(key)
+            btn.setFixedSize(40, 40)  # Reduced button size
+            speed_mode_buttons.addWidget(btn)
+            self.speed_mode_buttons[key] = btn
+        speed_mode_control.addLayout(speed_mode_buttons)
+
+        keyboard_layout.addLayout(angle_control)
+        keyboard_layout.addLayout(speed_mode_control)
+
+        # Reduce the overall size of the keyboard control section
+        keyboard_frame.setFixedHeight(150)  
+
+        layout.addWidget(keyboard_frame, 3, 0, 1, 4)
+
+
+#***********************************************    Event processing and robot control    **********************************************************#
+    # Handle keyboard press events for robot control
+    def keyPressEvent(self, event):
+        if self.is_auto:
+            key = event.text().upper()
+            if key in self.angle_buttons:
+                self.handle_angle_button_press(key)
+            elif key in self.speed_mode_buttons:
+                self.handle_speed_mode_button_press(key)
+
+
+    # Handle angle control button presses (A, S, D keys)
+    def handle_angle_button_press(self, key):
+        if self.is_auto:
+            for btn_key, btn in self.angle_buttons.items():
+                if btn_key == key:
+                    btn.setStyleSheet("background-color: green;")
+                    if key == 'A':
+                        self.rotate_wheels(-50000, -50000)
+                    elif key == 'D':
+                        self.rotate_wheels(50000, 50000)
+                    elif key == 'S':
+                        self.reset_wheels()
+                else:
+                    btn.setStyleSheet("")
+        else:
+            self.reset_button_colors()
+    
+    # Handle speed and moode control button presses (M, J, K, L keys)
+    def handle_speed_mode_button_press(self, key):
+        if self.is_auto:
+            for btn_key, btn in self.speed_mode_buttons.items():
+                if btn_key == key:
+                    if key != 'M':
+                        btn.setStyleSheet("background-color: green;")
+                    if key == 'L':
+                        self.set_speed_hex(self.current_speed + self.speed_increment)
+                    elif key == 'J':
+                        self.set_speed_hex(max(0, self.current_speed - self.speed_increment))
+                    elif key == 'K':
+                        self.set_speed_hex(0)
+                    elif key == 'M':
+                        self.toggle_direction()
+                elif btn_key != 'M':
+                    btn.setStyleSheet("")
+        else:
+            self.reset_button_colors()
+
+    # Toggle the auto mode on/off.
     def toggle_auto(self):
         self.is_auto = not self.is_auto
-        if self.is_auto:
-            self.auto_button.setStyleSheet("background-color: green;")
-        else:
-            self.auto_button.setStyleSheet("background-color: red;")
+        self.auto_button.setStyleSheet("background-color: green;" if self.is_auto else "background-color: red;")
+        if not self.is_auto:
+            self.reset_button_colors()
 
+
+    def reset_button_colors(self):
+        for btn in self.angle_buttons.values():
+            btn.setStyleSheet("")
+        for key, btn in self.speed_mode_buttons.items():
+            if key != 'M':
+                btn.setStyleSheet("")
+
+
+    # Update the wheel angle display and send command to the robot if in auto mode.
     def update_wheel_angle(self, wheel_index, value):
         angle_label, angle_value_label = self.wheel_labels[wheel_index]
         angle_value_label.setText(str(value))
 
+        self.update_speed_angle_frame()
+
         if self.is_auto:
             # Send command to move the actual robot wheel
-            command = f"{wheel_index} tmo {value}\n"
+            command = f"{wheel_index} {self.angle_change_cmd} {value}\n"
             self.send_command(command)
 
+
+    # Set the wheel angle based on user input. Validates the input, updates the display, and sends command to the robot.
     def set_wheel_angle(self, wheel_index, input_field):
         try:
             value = int(input_field.text())
@@ -303,8 +546,10 @@ class SkeletonPanel(QWidget):
                 self.wheel_labels[wheel_index][1].setText(str(value))
                 input_field.clear()
 
+                self.update_speed_angle_frame()
+
                 # Send command to move the actual robot wheel
-                command = f"{wheel_index} tmo {value}\n"
+                command = f"{wheel_index} {self.angle_change_cmd} {value}\n"
                 self.send_command(command)
 
                 # Update dial position
@@ -316,38 +561,112 @@ class SkeletonPanel(QWidget):
         except ValueError:
             input_field.setText("Error")
 
+
+    # Send the current position of all wheels to the robot.
     def send_all_wheel_positions(self):
         for i in range(4):
             value = int(self.wheel_labels[i][1].text())
-            command = f"{i} tmo {value}\n"
+            command = f"{i} {self.angle_change_cmd} {value}"
             self.send_command(command)
 
-    def change_all_wheel_speeds(self, delta):
-        speed_text = self.speed_label.text()
-        if ": " in speed_text:
-            try:
-                current_speed = int(speed_text.split(": ")[1])
-                new_speed = current_speed + delta
-                self.speed_label.setText(f'Speed: {new_speed}')
-            except ValueError:
-                pass
 
+    # Reset all wheels to the center position (0 degrees).
+    def reset_wheels(self):
+        self.rotate_wheels(0, 0)
+        self.log_message("Wheels reset to (0, 0)", add_newline=True)    
+
+        # Update all wheel labels to 0
+        for angle_label, angle_value_label in self.wheel_labels:
+            angle_value_label.setText('0')
+        
+        # Update the speed/angle frame
+        self.update_speed_angle_frame()
+
+    # Rotate the wheels to the specified angles.
+    def rotate_wheels(self, angle0, angle1):
+        self.log_message(f"Sent command: 0 {self.angle_change_cmd} {angle0}")
+        self.log_message(f"Sent command: 1 {self.angle_change_cmd} {angle1}", add_newline=True)
+        # Update wheel labels
+        self.wheel_labels[0][1].setText(str(angle0))
+        self.wheel_labels[1][1].setText(str(angle1))
+    
+        # Update the speed/angle frame
+        self.update_speed_angle_frame()
+
+    # Update the speed and angle display frame with current wheel angles
+    def update_speed_angle_frame(self):
+        for i, (_, angle_value_label) in enumerate(self.wheel_labels):
+            current_angle = angle_value_label.text()
+            self.wheel_value_labels[i].setText(current_angle)
+
+    # Toggle the direction of the robot between forward and backward.
+    def toggle_direction(self):
+        self.direction_params = "0" if self.direction_params == "1" else "1"
+        direction_text = "frontward" if self.direction_params == "1" else "backward"
+        self.log_message(f"###################")
+        self.log_message(f"#Direction Setting: {direction_text}#")
+        self.log_message(f"###################")
+        for i in range(4):
+            command = f"{i} {self.direction_change_cmd} {self.direction_params}"
+            self.log_message(f"Sent command: {command}")
+            self.send_command(command)
+        self.log_message("", add_newline=True)
+        self.update_direction_button_color()
+
+
+    def update_direction_button_color(self):
+        if self.direction_params == "1":
+            self.speed_mode_buttons['M'].setStyleSheet("background-color: green;")
+        else:
+            self.speed_mode_buttons['M'].setStyleSheet("background-color: red;")
+
+
+    def calculate_rpm(self, dec_value):
+        return round(dec_value * 1875 / (512 * 4096))
+
+
+    # Set the speed of all wheels to the specified hex value.
+    def set_speed_hex(self, speed_hex):
+        self.current_speed = speed_hex
+        rpm = self.calculate_rpm(speed_hex)
+        self.speed_label.setText(f'Speed: {self.current_speed} ({rpm} RPM)')
+        hex_speed = f"0x{self.current_speed:X}"
+        for i in range(4):
+            command = f"{i} {self.speed_change_cmd} {hex_speed}"
+            self.log_message(f"Sent command: {command}")
+            self.send_command(command)
+        self.log_message(f"Speed set to: {hex_speed} ({rpm} RPM)\n", add_newline=True)
+
+
+    # Change the speed of all wheels by the specified delta.
+    def change_all_wheel_speeds(self, delta):
+        new_speed = self.current_speed + delta
+        self.set_speed_hex(max(0, new_speed))
+
+
+    # Set the speed based on user input.
     def set_speed(self, input_field):
         try:
             value = int(input_field.text())
-            self.speed_label.setText(f'Speed: {value}')
+            self.set_speed_hex(value)
             input_field.clear()
         except ValueError:
             input_field.setText("Error")
 
+
+    # Start the robot by setting the speed to 1500000 and resetting wheel angles.
     def start_robot(self):
-        self.speed_label.setText('Speed: 1500000')
+        self.set_speed_hex(self.speed_increment)
         for angle_label, angle_value_label in self.wheel_labels:
             angle_value_label.setText('0')
 
-    def stop_robot(self):
-        self.speed_label.setText('Speed: 0')
 
+    # Stop the robot by setting the speed to 0 for all wheels.
+    def stop_robot(self):
+        self.set_speed_hex(0)
+
+
+    # Handle the resize event of the window.
     def resizeEvent(self, event):
         self.background.setGeometry(0, 0, self.width(), self.height())
         self.bg_image = QPixmap(self.image_path).scaled(self.width(), self.height(), Qt.IgnoreAspectRatio, Qt.SmoothTransformation)
@@ -355,20 +674,51 @@ class SkeletonPanel(QWidget):
         self.scene.addPixmap(self.bg_image)
         super().resizeEvent(event)
 
+
+#***********************************************    Event processing and robot control    **********************************************************#
+
+    # Receive and process data from the server
+    def receive_data(self):
+        while self.socket:
+            try:
+                data = self.socket.recv(1024)
+                if not data:
+                    break
+               
+            except Exception as e:
+                self.log_message(f"Error receiving data: {e}")
+                break
+        self.log_message("Disconnected from server")
+        self.socket = None
+
+    # Send control commands to the robot
     def send_command(self, command):
         if self.socket:
             try:
-                
                 if not command.endswith('\n'):
                     command += '\n'
                 self.socket.sendall(command.encode('utf-8'))
-                print(f"Sent command: {command.strip()}")
             except Exception as e:
                 print(f"Failed to send command: {e}")
+                self.log_message(f"Failed to send command: {e}")
         else:
-            print("Not connected to server")
+            print("Not connected to server (Admin Mode)")
+            self.log_message("Not connected to server (Admin Mode)")
 
+    
+    # Log messages to the UI for user feedback
+    def log_message(self, message, add_newline=False):
+        self.message_display.append(message)
+        if add_newline:
+            self.message_display.append("")
+        self.message_display.verticalScrollBar().setValue(
+            self.message_display.verticalScrollBar().maximum()
+        )
+        QApplication.processEvents()
+
+# Main execution
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    ex = SkeletonPanel()
-    sys.exit(app.exec_())
+    login_window = LoginWindow()
+    login_window.show()
+    sys.exit(app.exec_()) 

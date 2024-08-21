@@ -60,6 +60,21 @@ int ListenAndServe(int port){
 
         printf("connection accepted\n");
 
+        int client_type;
+            if (read(client_socket, &client_type, sizeof(int)) > 0) {
+                if(client_type){
+                    printf(" Client type: Terminal Client\n");        
+                }
+                else{
+                    printf("Client type: GUI Client\n");
+                }
+                
+            } else {
+                printf("Failed to read client type\n");
+                close(client_socket);
+                continue;
+            }
+
         int status = 0;
 
         int failed_read = 0;
@@ -88,24 +103,52 @@ int ListenAndServe(int port){
 
                 }
 
-                for(int i = 0 ; i < tmpread; i++){
+                if(client_type == 0){
 
-                    int idx = valread + i;
-                    req_buffer[idx] = recv_buffer[i]; 
+                    for(int i = 0 ; i < tmpread; i++){
+
+                        int idx = valread + i;
+                        req_buffer[idx] = recv_buffer[i]; 
+                        if(recv_buffer[i] == '\n'){
+
+                            req_buffer[idx + 1] = '\0';
+                            status = ProcessBuffer(ret_buffer, req_buffer);
+                            printf("Received command: %s ", req_buffer);
+                            printf("Process result: %s\n", ret_buffer);
+                            valwrite = write(client_socket, ret_buffer, strlen(ret_buffer));
+
+                            memset(req_buffer, 0, MAX_REQ_STRLEN);
+                            valread = 0;
+                            break;
+                        }
+
+                    }
+
+                    if(valread == 0) continue;
+
+                    memset(recv_buffer, 0, MAX_REQ_STRLEN);
+                    valread += tmpread;
+
+                } else if(client_type == 1){
+                    
+                    for(int i = 0 ; i < tmpread; i++){
+
+                        int idx = valread + i;
+                        req_buffer[idx] = recv_buffer[i];
+                    }
+
+                    memset(recv_buffer, 0, MAX_REQ_STRLEN);
+                    valread += tmpread;
+                }
+                }
+
+                if(failed_read == 1){
+
+                    status = 10;
+                    break;
 
                 }
 
-
-                memset(recv_buffer, 0, MAX_REQ_STRLEN);
-                valread += tmpread;
-            }
-
-            if(failed_read == 1){
-
-                status = 10;
-                break;
-
-            }
 
 
             printf("recv: %s\n",req_buffer);
